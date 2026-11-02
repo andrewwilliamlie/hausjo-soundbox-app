@@ -110,7 +110,7 @@ export default function HomeClient({ app, isNew }: { app: AppView; isNew: boolea
   const tasks = [
     { name: 'Data pendaftaran terkirim', sub: 'Foto e-KTP, selfie dan data usaha', done: true, tag: 'Selesai', open: null as null | (() => void) },
     { name: 'Tambah rekening pencairan', sub: app.bankSet ? `${app.bankLabel} · cair ${app.settlement === 'H1' ? 'H+1' : 'hari yang sama'}` : 'Supaya QRIS bisa diterbitkan bank', done: app.bankSet, tag: app.bankSet ? 'Selesai' : 'Wajib', open: active || app.status === 'BANK' ? null : () => setSheet('bank') },
-    { name: 'Soundbox', sub: SB_SUB[app.soundboxStatus], done: sbDone, tag: sbDone ? 'Selesai' : 'Opsional', open: () => setSheet('sb') },
+    { name: 'Soundbox', sub: !sbDone && app.product === 'SOUNDBOX' ? 'Pilih: beli sekarang, sudah beli di marketplace/sales, atau sudah sampai' : SB_SUB[app.soundboxStatus], done: sbDone, tag: sbDone ? 'Selesai' : app.product === 'SOUNDBOX' ? 'Pilih' : 'Opsional', open: () => setSheet('sb') },
     { name: 'QRIS siap dipakai', sub: active ? 'Aktif · unduh stiker di atas' : app.bankSet ? 'Diterbitkan bank 1–2 hari kerja' : 'Terbuka setelah rekening ditambahkan', done: active, tag: '', open: null }
   ];
   const doneCount = tasks.filter((t) => t.done).length;

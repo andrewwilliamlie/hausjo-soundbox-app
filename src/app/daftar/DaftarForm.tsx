@@ -2,31 +2,12 @@
 
 import Link from 'next/link';
 import { useActionState, useState } from 'react';
-import { MARKETPLACES } from '@/lib/provinces';
 import { suggestEmail } from '@/lib/rules';
 import { createAccount, type FormState } from './actions';
-
-type SbStatus = 'beli' | 'market' | 'sales' | 'sampai';
-
-const SB_OPTS: Array<[SbStatus, string]> = [
-  ['beli', 'Belum beli'],
-  ['market', 'Sudah pesan di marketplace'],
-  ['sales', 'Dari sales'],
-  ['sampai', 'Sudah sampai']
-];
-
-const SB_HINT: Record<SbStatus, string> = {
-  beli: 'Bayar Rp349.000 di aplikasi setelah pendaftaran terkirim.',
-  market: 'Tidak perlu bayar lagi. Admin mencocokkan No. Pesanan Anda.',
-  sales: 'Tidak perlu bayar lagi. Isi nama sales HausJo.',
-  sampai: 'Setelah daftar, pindai barcode SN Soundbox di aplikasi. CS akan memandu aktivasi.'
-};
 
 export default function DaftarForm({ initialProduct }: { initialProduct: 'soundbox' | 'qris' }) {
   const [state, action, pending] = useActionState<FormState, FormData>(createAccount, { error: null });
   const [product, setProduct] = useState(initialProduct);
-  const [sb, setSb] = useState<SbStatus>('beli');
-  const [market, setMarket] = useState(MARKETPLACES[0]);
   const [email, setEmail] = useState('');
   const fix = suggestEmail(email);
 
@@ -38,8 +19,6 @@ export default function DaftarForm({ initialProduct }: { initialProduct: 'soundb
       </div>
 
       <input type="hidden" name="product" value={product} />
-      <input type="hidden" name="sbStatus" value={sb} />
-      <input type="hidden" name="marketplace" value={market} />
 
       <div style={{ display: 'flex', gap: 10 }} role="radiogroup" aria-label="Jenis pendaftaran">
         {([['soundbox', 'Soundbox QRIS', 'Rp349.000', 'QRIS + Soundbox'], ['qris', 'QRIS saja', 'Gratis', 'Stiker QRIS, tanpa Soundbox']] as const).map(
@@ -54,28 +33,7 @@ export default function DaftarForm({ initialProduct }: { initialProduct: 'soundb
       </div>
 
       {product === 'soundbox' && (
-        <div className="card" style={{ gap: 10, padding: 14 }}>
-          <span style={{ fontSize: 13, fontWeight: 700 }}>Soundbox Anda</span>
-          <div style={{ display: 'flex', flexWrap: 'wrap', gap: 8 }}>
-            {SB_OPTS.map(([id, label]) => (
-              <button key={id} type="button" className="chip" aria-pressed={sb === id} onClick={() => setSb(id)}>{label}</button>
-            ))}
-          </div>
-          <p className="hint">{SB_HINT[sb]}</p>
-          {sb === 'market' && (
-            <>
-              <div style={{ display: 'flex', flexWrap: 'wrap', gap: 8 }}>
-                {MARKETPLACES.map((m) => (
-                  <button key={m} type="button" className="chip" aria-pressed={market === m} onClick={() => setMarket(m)}>{m}</button>
-                ))}
-              </div>
-              <label className="field">No. Pesanan<input className="input" name="orderNo" placeholder="Contoh: 2611017AB3CD9Z" /></label>
-            </>
-          )}
-          {sb === 'sales' && (
-            <label className="field">Nama sales HausJo<input className="input" name="salesName" placeholder="Nama sales yang mendatangi Anda" /></label>
-          )}
-        </div>
+        <p className="note" style={{ margin: 0 }}>Sudah beli Soundbox di marketplace, lewat sales, atau Soundbox sudah sampai? Pilih di aplikasi setelah daftar, tidak perlu bayar lagi.</p>
       )}
 
       <label className="field">Nomor WhatsApp
