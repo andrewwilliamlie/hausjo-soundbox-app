@@ -22,11 +22,9 @@ COPY --from=build /app/.next/static ./.next/static
 COPY --from=build /app/public ./public
 COPY --from=build /app/prisma ./prisma
 COPY --from=build /app/scripts ./scripts
-COPY --from=build /app/node_modules/prisma ./node_modules/prisma
-COPY --from=build /app/node_modules/@prisma ./node_modules/@prisma
-COPY --from=build /app/node_modules/.prisma ./node_modules/.prisma
-COPY --from=build /app/node_modules/bcryptjs ./node_modules/bcryptjs
-RUN mkdir -p /data/uploads && chown -R app:app /data /app
+# Full node_modules: the Prisma CLI (schema sync at start-up) needs its own dependencies
+COPY --from=build /app/node_modules ./node_modules
+RUN mkdir -p /data/uploads && chown -R app:app /data && chown app:app /app
 USER app
 EXPOSE 3000
 # Apply the schema, make sure the first admin exists, then start the server
