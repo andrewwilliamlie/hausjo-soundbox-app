@@ -1,0 +1,189 @@
+// HausJo merchant onboarding data model.
+// Column comments name the matching column in the QRIS Sheet used for bank exports.
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+enum AppStatus {
+  DRAFT       // signup started, not submitted
+  SUBMITTED   // waiting for admin review ("Baru")
+  REVISION    // one or more documents rejected ("Perlu revisi")
+  BANK        // approved, sent to bank ("Proses bank")
+  ACTIVE      // NMID + sticker saved ("QRIS aktif")
+  REJECTED    // closed ("Ditolak")
+}
+
+enum Product {
+  SOUNDBOX
+  QRIS
+}
+
+enum SoundboxStatus {
+  NONE        // QRIS only
+  BUY         // buys in the app (Doku)
+  MARKETPLACE // already ordered on a marketplace (orderNo)
+  SALES       // through a HausJo sales rep (salesName)
+  ARRIVED     // already delivered, SN scanned in the app
+}
+
+enum Settlement {
+  H1
+  SAME_DAY
+}
+
+enum PartnerBank {
+  BCA
+  NOBU
+  BAYARIND
+}
+
+enum DocKind {
+  KTP
+  SELFIE
+  STORE_FRONT
+  PRODUCT
+  QRIS_STICKER
+}
+
+enum DocDecision {
+  PENDING
+  APPROVED
+  REJECTED
+}
+
+enum AdminRole {
+  REVIEWER    // checks documents
+  ACTIVATION  // routes to bank, enters bank IDs, uploads stickers
+  ADMIN       // everything, incl. exports and users
+}
+
+model User {
+  id           String        @id @default(cuid())
+  phone        String        @unique // NO WHATSAPP PEMILIK USAHA
+  email        String        @unique // ALAMAT EMAIL
+  passwordHash String
+  referralCode String?
+  createdAt    DateTime      @default(now())
+  applications Application[]
+}
+
+model Application {
+  id        String    @id @default(cuid())
+  ticket    String    @unique // HJO-YYYYMMDD-XXXXX
+  userId    String
+  user      User      @relation(fields: [userId], references: [id])
+  status    AppStatus @default(DRAFT)
+
+  product        Product        @default(SOUNDBOX)
+  soundboxStatus SoundboxStatus @default(BUY)
+  marketplace    String?
+  orderNo        String?
+  salesName      String?
+  soundboxPaidAt DateTime?
+
+  // Owner, from the e-KTP (OCR-filled, confirmed by the merchant)
+  ktpName       String? // NAMA LENGKAP PEMILIK USAHA
+  nik           String? // NIK E-KTP PEMILIK USAHA
+  birthPlace    String?
+  birthDate     String?
+  gender        String?
+  religion      String?
+  occupation    String?
+  ktpAddress    String?
+  ocrConfidence Int?
+  ocrEdited     Boolean @default(false)
+
+  // Business
+  hasStore     Boolean @default(true)  // APAKAH MEMILIKI TOKO FISIK?
+  sellsOffline Boolean @default(true)
+  sellsOnline  Boolean @default(false)
+  onlineLink   String? // WEBSITE
+  businessType String?
+  businessName String? // NAMA USAHA (max 25, capitals)
+  street       String? // nama jalan
+  number       String? // nomor / blok tempat usaha
+  rt           String?
+  rw           String?
+  kelurahan    String?
+  kecamatan    String?
+  city         String? // KOTA / KABUPATEN
+  province     String?
+  postalCode   String? // KODE POS
+  lat          Float?
+  lng          Float?
+  turnover     String  @default("UMI") // KATEGORI USAHA BERDASARKAN OMZET
+
+  // Payout (added in the app; required before the bank can issue the NMID)
+  bankName      String? // BANK PENAMPUNG
+  accountNo     String? // NO REK PENAMPUNG
+  accountHolder String? // Nama Pemilik Rekening
+  settlement    Settlement @default(H1) // drives MDR HAUSJO (%)
+
+  // Admin-only
+  routedBank   PartnerBank?
+  mcc          String? // MCC - JENIS USAHA
+  riskCategory String? // KATEGORI USAHA BERDASARKAN RISK
+  qrisType     String? // TIPE QRIS
+  mpan         String? // MPAN
+  mid          String? // MID
+  nmid         String? // NMID NOBU / NMID BAYARIND / NMID BCA (by routedBank)
+  serialNumber String? // Serial Number
+  picActivation String? // PIC Aktivasi (filled by hand)
+  activatedAt  DateTime?
+  courier      String?
+  trackingNo   String?
+  shippedAt    DateTime?
+  needsGuide   Boolean   @default(false)
+  guidedAt     DateTime?
+  revisionNote String?
+
+  submittedAt DateTime?
+  createdAt   DateTime   @default(now())
+  updatedAt   DateTime   @updatedAt
+  documents   Document[]
+  audits      AuditLog[]
+
+  @@index([status])
+}
+
+model Document {
+  id            String      @id @default(cuid())
+  applicationId String
+  application   Application @relation(fields: [applicationId], references: [id], onDelete: Cascade)
+  kind          DocKind
+  storagePath   String      // under UPLOAD_DIR, never served directly
+  mime          String
+  size          Int
+  decision      DocDecision @default(PENDING)
+  rejectReason  String?
+  createdAt     DateTime    @default(now())
+
+  @@index([applicationId, kind])
+}
+
+model Admin {
+  id           String     @id @default(cuid())
+  email        String     @unique
+  name         String
+  passwordHash String
+  role         AdminRole  @default(REVIEWER)
+  createdAt    DateTime   @default(now())
+  audits       AuditLog[]
+}
+
+model AuditLog {
+  id            String       @id @default(cuid())
+  adminId       String?
+  admin         Admin?       @relation(fields: [adminId], references: [id])
+  applicationId String?
+  application   Application? @relation(fields: [applicationId], references: [id])
+  action        String       // e.g. VIEW_KTP, APPROVE, EXPORT
+  detail        String?
+  createdAt     DateTime     @default(now())
+}
