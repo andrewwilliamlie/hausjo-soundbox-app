@@ -2,6 +2,7 @@
 
 import Link from 'next/link';
 import { useActionState, useState } from 'react';
+import Icon from '@/components/Icon';
 import { suggestEmail } from '@/lib/rules';
 import { createAccount, type FormState } from './actions';
 
@@ -24,6 +25,10 @@ export default function DaftarForm({ initialProduct }: { initialProduct: 'soundb
         {([['soundbox', 'Soundbox QRIS', 'Rp349.000', 'QRIS + Soundbox'], ['qris', 'QRIS saja', 'Gratis', 'Stiker QRIS, tanpa Soundbox']] as const).map(
           ([id, name, price, desc]) => (
             <button key={id} type="button" role="radio" aria-checked={product === id} className="choice" onClick={() => setProduct(id)}>
+              <span style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', width: '100%' }}>
+                <Icon name={id === 'soundbox' ? 'speaker' : 'qris'} color={product === id ? 'var(--blue)' : 'var(--muted)'} />
+                <span aria-hidden="true" className={product === id ? 'task-dot done' : ''} style={{ width: 22, height: 22, fontSize: 12, borderRadius: '50%', border: product === id ? 0 : '2px solid #c9d3e3', display: 'inline-flex', alignItems: 'center', justifyContent: 'center' }}>{product === id ? '✓' : ''}</span>
+              </span>
               <span style={{ fontSize: 15, fontWeight: 800 }}>{name}</span>
               <span style={{ fontSize: 13, fontWeight: 700, color: 'var(--navy)' }}>{price}</span>
               <span className="hint">{desc}</span>
@@ -33,7 +38,7 @@ export default function DaftarForm({ initialProduct }: { initialProduct: 'soundb
       </div>
 
       {product === 'soundbox' && (
-        <p className="note" style={{ margin: 0 }}>Sudah beli Soundbox di marketplace, lewat sales, atau Soundbox sudah sampai? Pilih di aplikasi setelah daftar, tidak perlu bayar lagi.</p>
+        <p className="note fade-in" style={{ margin: 0 }}>Sudah beli Soundbox di marketplace, lewat sales, atau Soundbox sudah sampai? Pilih di aplikasi setelah daftar, tidak perlu bayar lagi.</p>
       )}
 
       <label className="field">Nomor WhatsApp

@@ -1,7 +1,7 @@
 'use client';
 
-import { useRouter } from 'next/navigation';
 import { useState } from 'react';
+import Icon, { IconTile, type IconName } from '@/components/Icon';
 import { BUSINESS_TYPES, PROVINCES } from '@/lib/provinces';
 import { checkBusinessName, checkNik } from '@/lib/rules';
 
@@ -22,6 +22,11 @@ const TURNOVER: Array<[string, string]> = [
   ['UBE', 'Di atas Rp50 miliar/tahun']
 ];
 
+const CONFETTI: Array<[number, string, number]> = [
+  [-140, '#1f5fd6', 0], [-100, '#12b76a', .05], [-60, '#f79009', .1], [-25, '#8db4ff', 0], [20, '#0b2253', .08],
+  [55, '#f79009', .02], [95, '#1f5fd6', .12], [135, '#12b76a', .04], [-120, '#f79009', .15], [115, '#8db4ff', .18]
+];
+
 async function post(url: string, body?: unknown) {
   const res = await fetch(url, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: body ? JSON.stringify(body) : undefined });
   const json = await res.json().catch(() => ({}));
@@ -29,14 +34,19 @@ async function post(url: string, body?: unknown) {
   return json;
 }
 
-export function Upload({ kind, label, done, onDone }: { kind: string; label: string; done: boolean; onDone: (ocr?: { fields: Partial<Data>; confidence: number } | null) => void }) {
+export function Upload({ kind, label, done, onDone, icon = 'upload', front = false, tall = false }: {
+  kind: string; label: string; done: boolean; icon?: IconName; front?: boolean; tall?: boolean;
+  onDone: (ocr?: { fields: Partial<Data>; confidence: number } | null) => void;
+}) {
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState('');
+  const [preview, setPreview] = useState<string | null>(null);
   async function pick(e: React.ChangeEvent<HTMLInputElement>) {
     const file = e.target.files?.[0];
     if (!file) return;
     setBusy(true);
     setError('');
+    const local = URL.createObjectURL(file);
     const fd = new FormData();
     fd.append('kind', kind);
     fd.append('file', file);
@@ -44,28 +54,37 @@ export function Upload({ kind, label, done, onDone }: { kind: string; label: str
       const res = await fetch('/api/app/upload', { method: 'POST', body: fd });
       const json = await res.json();
       if (!res.ok) throw new Error(json.error || 'Gagal mengunggah');
+      setPreview(local);
       onDone(json.ocr);
     } catch (err) {
+      URL.revokeObjectURL(local);
       setError((err as Error).message);
     } finally {
       setBusy(false);
       e.target.value = '';
     }
   }
+  const cls = busy ? 'upload busy' : done ? 'upload done' : 'upload';
   return (
     <div style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
-      <label className={done ? 'upload done' : 'upload'}>
-        <input type="file" accept="image/jpeg,image/png,image/webp" capture="environment" onChange={pick} aria-label={label} />
-        <span>{label}</span>
-        <span style={{ fontSize: 11.5, fontWeight: 500 }}>{busy ? 'Mengunggah…' : done ? 'Terunggah ✓ · ketuk untuk ganti' : 'Ketuk untuk ambil foto'}</span>
+      <label className={cls} style={{ minHeight: tall ? 150 : 116 }}>
+        <input type="file" accept="image/jpeg,image/png,image/webp" capture={front ? 'user' : 'environment'} onChange={pick} aria-label={label} disabled={busy} />
+        {preview && done && !busy && (
+          <img src={preview} alt="" aria-hidden="true" style={{ position: 'absolute', inset: 0, width: '100%', height: '100%', objectFit: 'cover', opacity: 0.25 }} />
+        )}
+        {busy && <span className="scanline" aria-hidden="true" />}
+        <span style={{ position: 'relative', display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 6 }}>
+          {done && !busy ? <span className="donemark"><Icon name="check" size={18} strokeWidth={3} /></span> : <Icon name={icon} size={28} />}
+          <span>{label}</span>
+          <span style={{ fontSize: 11.5, fontWeight: 500 }}>{busy ? (kind === 'KTP' ? 'Membaca e-KTP…' : 'Mengunggah…') : done ? 'Terunggah · ketuk untuk ganti' : 'Ketuk untuk ambil foto'}</span>
+        </span>
       </label>
-      {error && <span className="err">{error}</span>}
+      {error && <span className="err" role="alert">{error}</span>}
     </div>
   );
 }
 
 export default function Steps({ initial, uploaded, product }: { initial: Data; uploaded: Record<string, boolean>; product: string }) {
-  const router = useRouter();
   const [step, setStep] = useState(0); // 0 intro, 1 KTP, 2 usaha, 3 konfirmasi
   const [d, setD] = useState<Data>(initial);
   const [up, setUp] = useState<Record<string, boolean>>(uploaded);
@@ -74,6 +93,7 @@ export default function Steps({ initial, uploaded, product }: { initial: Data; u
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState('');
   const [agree, setAgree] = useState(false);
+  const [ticket, setTicket] = useState('');
   const [locMsg, setLocMsg] = useState(initial.lat != null ? 'Lokasi toko tersimpan' : '');
 
   const set = <K extends keyof Data>(k: K, v: Data[K]) => {
@@ -119,8 +139,10 @@ export default function Steps({ initial, uploaded, product }: { initial: Data; u
       const body = payload(step);
       if (body) await post('/api/app/save', body);
       if (step === 3) {
-        await post('/api/app/submit');
-        router.push('/app?baru=1');
+        const res = await post('/api/app/submit');
+        setTicket(res.ticket || '');
+        setStep(4);
+        window.scrollTo({ top: 0 });
         return;
       }
       setStep(step + 1);
@@ -146,7 +168,7 @@ export default function Steps({ initial, uploaded, product }: { initial: Data; u
 
   return (
     <main className="content">
-      {step > 0 && (
+      {step > 0 && step < 4 && (
         <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
           <span className="hint" style={{ fontWeight: 600 }}>Langkah {step} dari 3 · {labels[step - 1]}</span>
           <div className="steps" aria-hidden="true">{labels.map((_, i) => <i key={i} className={i < step ? 'on' : ''} />)}</div>
@@ -157,10 +179,13 @@ export default function Steps({ initial, uploaded, product }: { initial: Data; u
         <div className="screen-in" style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
           <h1 style={{ margin: 0, fontSize: 24, fontWeight: 800 }}>3 langkah, sekitar 5 menit</h1>
           <p className="hint" style={{ fontSize: 13.5 }}>Lakukan di toko Anda dan siapkan e-KTP asli.</p>
-          {[['1 · Foto e-KTP & selfie', 'Data KTP terbaca otomatis bila tersedia'], ['2 · Data usaha', 'Lokasi toko dan foto toko'], ['3 · Konfirmasi', 'Periksa, lalu kirim']].map(([t, s]) => (
-            <div key={t} className="card" style={{ padding: 14, gap: 2 }}><strong style={{ fontSize: 15 }}>{t}</strong><span className="hint">{s}</span></div>
+          {([['ktp', 'blue', '1 · Foto e-KTP & selfie', 'Data KTP terbaca otomatis bila tersedia'], ['store', 'orange', '2 · Data usaha', 'Lokasi toko dan foto toko'], ['checkCircle', 'green', '3 · Konfirmasi', 'Periksa, lalu kirim']] as const).map(([ic, tone, t, s], i) => (
+            <div key={t} className={`card rise rise-${i + 1}`} style={{ padding: 14, flexDirection: 'row', alignItems: 'center', gap: 14 }}>
+              <IconTile name={ic} tone={tone} />
+              <span style={{ display: 'flex', flexDirection: 'column', gap: 2 }}><strong style={{ fontSize: 15 }}>{t}</strong><span className="hint">{s}</span></span>
+            </div>
           ))}
-          <div className="note">Setelah dikirim, Anda langsung masuk aplikasi. Tambah rekening{product === 'SOUNDBOX' ? ' dan urus Soundbox' : ''} dari sana sambil kami memeriksa data.</div>
+          <div className="note rise rise-4">Setelah dikirim, Anda langsung masuk aplikasi. Tambah rekening{product === 'SOUNDBOX' ? ' dan urus Soundbox' : ''} dari sana sambil kami memeriksa data.</div>
         </div>
       )}
 
@@ -168,11 +193,11 @@ export default function Steps({ initial, uploaded, product }: { initial: Data; u
         <div className="screen-in" style={{ display: 'flex', flexDirection: 'column', gap: 14 }}>
           <h1 style={{ margin: 0, fontSize: 22, fontWeight: 800 }}>Foto e-KTP &amp; selfie</h1>
           <p className="hint">Foto di tempat terang, seluruh KTP terlihat, tidak buram.</p>
-          <Upload kind="KTP" label="Foto e-KTP" done={!!up.KTP} onDone={(ocr) => {
+          <Upload kind="KTP" label="Foto e-KTP" icon="ktp" tall done={!!up.KTP} onDone={(ocr) => {
             setUp((u) => ({ ...u, KTP: true }));
             if (ocr) { setD((x) => ({ ...x, ...ocr.fields })); setOcrFilled(true); setOcrEdited(false); }
           }} />
-          {ocrFilled && <span className="okmsg">Terbaca otomatis. Periksa dan ubah jika ada yang salah.</span>}
+          {ocrFilled && <span className="okmsg fade-in" style={{ display: 'flex', gap: 6, alignItems: 'center' }}><Icon name="spark" size={16} />Terbaca otomatis. Periksa dan ubah jika ada yang salah.</span>}
           <label className="field">Nama lengkap sesuai e-KTP<input className={ocrFilled ? 'input ocr' : 'input'} value={d.ktpName} onChange={(e) => set('ktpName', e.target.value.toUpperCase())} /></label>
           <label className="field">NIK (16 digit)
             <input className={!nik.ok && d.nik.length >= 16 ? 'input bad' : ocrFilled ? 'input ocr' : 'input'} inputMode="numeric" value={d.nik} onChange={(e) => set('nik', e.target.value.replace(/\s/g, ''))} />
@@ -184,8 +209,14 @@ export default function Steps({ initial, uploaded, product }: { initial: Data; u
           </div>
           <label className="field">Alamat sesuai e-KTP<input className="input" value={d.ktpAddress} onChange={(e) => set('ktpAddress', e.target.value.toUpperCase())} /></label>
           <h2 className="h2" style={{ fontSize: 15, marginTop: 6 }}>Selfie pegang e-KTP</h2>
-          <p className="hint">Tempat terang · tanpa topi, masker atau kacamata · KTP di samping wajah.</p>
-          <Upload kind="SELFIE" label="Selfie dengan e-KTP" done={!!up.SELFIE} onDone={() => setUp((u) => ({ ...u, SELFIE: true }))} />
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, minmax(0, 1fr))', gap: 8 }}>
+            {([['sun', 'Tempat terang'], ['noHat', 'Tanpa topi, masker, kacamata'], ['card', 'KTP di samping wajah']] as const).map(([ic, t]) => (
+              <span key={t} style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 6, textAlign: 'center', fontSize: 11.5, fontWeight: 600, color: 'var(--muted)', background: '#fff', border: '1px solid var(--line)', borderRadius: 12, padding: '10px 6px' }}>
+                <Icon name={ic} size={22} color="var(--blue)" />{t}
+              </span>
+            ))}
+          </div>
+          <Upload kind="SELFIE" label="Selfie dengan e-KTP" icon="selfie" front done={!!up.SELFIE} onDone={() => setUp((u) => ({ ...u, SELFIE: true }))} />
         </div>
       )}
 
@@ -193,8 +224,9 @@ export default function Steps({ initial, uploaded, product }: { initial: Data; u
         <div className="screen-in" style={{ display: 'flex', flexDirection: 'column', gap: 14 }}>
           <h1 style={{ margin: 0, fontSize: 22, fontWeight: 800 }}>Data usaha</h1>
           <div style={{ display: 'flex', gap: 10 }} role="radiogroup" aria-label="Toko">
-            {([[true, 'Punya toko', 'Warung, kios, toko tetap'], [false, 'Tidak punya toko', 'Jualan dari rumah / online']] as const).map(([v, t, s]) => (
+            {([[true, 'store', 'Punya toko', 'Warung, kios, toko tetap'], [false, 'home', 'Tidak punya toko', 'Jualan dari rumah / online']] as const).map(([v, ic, t, s]) => (
               <button key={t} type="button" role="radio" aria-checked={d.hasStore === v} className="choice" onClick={() => set('hasStore', v)}>
+                <Icon name={ic} size={24} color={d.hasStore === v ? 'var(--blue)' : 'var(--muted)'} />
                 <strong style={{ fontSize: 14 }}>{t}</strong><span className="hint">{s}</span>
               </button>
             ))}
@@ -215,7 +247,7 @@ export default function Steps({ initial, uploaded, product }: { initial: Data; u
           </label>
 
           <h2 className="h2" style={{ fontSize: 15, marginTop: 6 }}>Alamat toko</h2>
-          <button type="button" className="btn btn-ghost" onClick={locate}>Gunakan lokasi saya sekarang</button>
+          <button type="button" className="btn btn-ghost" onClick={locate} style={{ gap: 8 }}><Icon name="pin" size={18} />Gunakan lokasi saya sekarang</button>
           {locMsg && <span className={d.lat != null ? 'okmsg' : 'hint'}>{locMsg}</span>}
           <label className="field">Provinsi
             <select className="input" value={d.province} onChange={(e) => set('province', e.target.value)}>
@@ -236,8 +268,8 @@ export default function Steps({ initial, uploaded, product }: { initial: Data; u
             <label className="field">RW<input className="input" inputMode="numeric" value={d.rw} onChange={(e) => set('rw', e.target.value)} /></label>
           </div>
           <div style={{ display: 'grid', gridTemplateColumns: 'repeat(2, minmax(0, 1fr))', gap: 10 }}>
-            <Upload kind="STORE_FRONT" label="Foto depan toko" done={!!up.STORE_FRONT} onDone={() => setUp((u) => ({ ...u, STORE_FRONT: true }))} />
-            <Upload kind="PRODUCT" label="Foto produk di toko" done={!!up.PRODUCT} onDone={() => setUp((u) => ({ ...u, PRODUCT: true }))} />
+            <Upload kind="STORE_FRONT" label="Foto depan toko" icon="store" done={!!up.STORE_FRONT} onDone={() => setUp((u) => ({ ...u, STORE_FRONT: true }))} />
+            <Upload kind="PRODUCT" label="Foto produk di toko" icon="box" done={!!up.PRODUCT} onDone={() => setUp((u) => ({ ...u, PRODUCT: true }))} />
           </div>
           <p className="hint">Nama toko harus terlihat jelas di foto depan toko.</p>
           <label className="field">Omzet per tahun
@@ -271,13 +303,33 @@ export default function Steps({ initial, uploaded, product }: { initial: Data; u
         </div>
       )}
 
+      {step === 4 && (
+        <div className="screen-in" style={{ position: 'relative', display: 'flex', flexDirection: 'column', alignItems: 'center', textAlign: 'center', gap: 14, paddingTop: 24 }}>
+          <div className="confetti" aria-hidden="true">
+            {CONFETTI.map(([dx, c, delay], i) => <span key={i} style={{ background: c, animationDelay: `${delay}s`, ['--dx' as string]: `${dx}px` } as React.CSSProperties} />)}
+          </div>
+          <span className="pop" style={{ width: 84, height: 84, borderRadius: '50%', background: '#12b76a', color: '#fff', display: 'inline-flex', alignItems: 'center', justifyContent: 'center', boxShadow: '0 10px 30px rgba(18,183,106,.35)' }}>
+            <Icon name="check" size={44} strokeWidth={3} />
+          </span>
+          <h1 className="rise rise-1" style={{ margin: 0, fontSize: 24, fontWeight: 800 }}>Pendaftaran terkirim!</h1>
+          <p className="hint rise rise-2" style={{ fontSize: 14 }}>Tim kami memeriksa data Anda. QRIS biasanya aktif dalam 1–2 hari kerja. Kabar terbaru dikirim ke email Anda.</p>
+          {ticket && <div className="card rise rise-2" style={{ padding: '12px 16px', gap: 2, alignItems: 'center' }}><span className="hint">Nomor tiket</span><strong style={{ fontSize: 17, letterSpacing: .5 }}>{ticket}</strong></div>}
+          <div className="card rise rise-3" style={{ textAlign: 'left', width: '100%', gap: 12 }}>
+            <strong style={{ fontSize: 15 }}>Sambil menunggu</strong>
+            <span style={{ display: 'flex', gap: 12, alignItems: 'center', fontSize: 14 }}><IconTile name="bank" size={36} />Tambah rekening pencairan (wajib)</span>
+            {product === 'SOUNDBOX' && <span style={{ display: 'flex', gap: 12, alignItems: 'center', fontSize: 14 }}><IconTile name="speaker" tone="orange" size={36} />Urus Soundbox Anda</span>}
+          </div>
+          <a href="/app" className="btn btn-primary btn-block rise rise-4" style={{ gap: 6 }}>Masuk ke aplikasi <Icon name="chevron" size={18} /></a>
+        </div>
+      )}
+
       {error && <p className="err" role="alert">{error}</p>}
-      <div style={{ display: 'flex', gap: 10, marginTop: 'auto', paddingTop: 8 }}>
+      {step < 4 && <div style={{ display: 'flex', gap: 10, marginTop: 'auto', paddingTop: 8 }}>
         {step > 0 && <button type="button" className="btn btn-ghost" onClick={() => { setError(''); setStep(step - 1); }}>Kembali</button>}
         <button type="button" className="btn btn-primary" style={{ flex: 1 }} disabled={busy || (step === 3 && !agree)} onClick={next}>
           {busy ? 'Menyimpan…' : step === 0 ? 'Mulai' : step === 3 ? 'Kirim pendaftaran' : 'Lanjut'}
         </button>
-      </div>
+      </div>}
     </main>
   );
 }
