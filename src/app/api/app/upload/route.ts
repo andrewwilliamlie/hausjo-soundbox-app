@@ -41,6 +41,18 @@ export async function POST(req: Request) {
     if (stillRejected === 0) await db.application.update({ where: { id: app.id }, data: { status: 'SUBMITTED', revisionNote: null } });
   }
 
+  // Liveness result reported by the phone for the selfie (checked on the device, so it is a signal, not proof).
+  if (kind === 'SELFIE') {
+    let live: { passed?: unknown; challenges?: unknown; ms?: unknown; note?: unknown } = {};
+    try { live = JSON.parse(String(form.get('liveness') ?? '{}')); } catch { /* treated as no check */ }
+    const NAMES: Record<string, string> = { blink: 'kedip', turn: 'toleh', smile: 'senyum' };
+    const passed = live.passed === true;
+    const acts = Array.isArray(live.challenges) ? live.challenges.map((c) => NAMES[String(c)]).filter(Boolean).join(', ') : '';
+    const secs = typeof live.ms === 'number' ? Math.round(live.ms / 1000) : null;
+    const note = passed ? `${acts}${secs != null ? ` · ${secs} dtk` : ''}` : String(live.note ?? 'Diunggah tanpa cek wajah').slice(0, 200);
+    await db.application.update({ where: { id: app.id }, data: { livenessPassed: passed, livenessAt: new Date(), livenessNote: note } });
+  }
+
   let ocr = null;
   // OCR only while the merchant is still filling in the form; it never overwrites data the team has reviewed.
   if (kind === 'KTP' && app.status === 'DRAFT') {

@@ -53,3 +53,7 @@ The first admin comes from `INITIAL_ADMIN_EMAIL`/`INITIAL_ADMIN_PASSWORD`. Every
 ## KTP OCR (Google Cloud Vision)
 
 Set `OCR_PROVIDER=google` and `OCR_API_KEY` (API key restricted to the Cloud Vision API) in the Docker project's environment. On upload of the e-KTP photo during signup, `src/lib/ocr.ts` calls Vision `DOCUMENT_TEXT_DETECTION` and `src/lib/ktp-parse.ts` reads NIK, nama, tempat/tgl lahir, jenis kelamin, alamat (with RT/RW, kel., kec., city), agama and pekerjaan from the word positions. Any error or timeout falls back to manual typing. Confidence below 90 or a merchant edit is flagged to reviewers. Photos are shrunk to 1600 px in the browser before upload.
+
+## Selfie liveness check
+
+The selfie step runs a face check on the merchant's phone (MediaPipe Face Landmarker, `src/app/daftar/langkah/LiveSelfie.tsx`): two random actions out of blink / turn head / smile, then the selfie is captured from the live camera while facing forward. The WASM engine and model are downloaded during the Docker build into `public/mediapipe/` and served from our own domain. Only the final photo is uploaded; the result is stored as `livenessPassed`/`livenessNote` and shown to reviewers. After two failed attempts, or with no camera, the merchant can upload a normal photo, which is flagged. It runs in the browser, so treat it as a strong hint, not proof.

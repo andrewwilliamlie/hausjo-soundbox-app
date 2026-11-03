@@ -8,7 +8,11 @@ const nextConfig = {
   poweredByHeader: false,
   // Region lists change only with a new Kemendagri decree; let phones cache them for a day.
   async headers() {
-    return [{ source: '/wilayah/:file*', headers: [{ key: 'Cache-Control', value: 'public, max-age=86400, stale-while-revalidate=604800' }] }];
+    const day = [{ key: 'Cache-Control', value: 'public, max-age=86400, stale-while-revalidate=604800' }];
+    return [
+      { source: '/wilayah/:file*', headers: day },
+      { source: '/mediapipe/:path*', headers: day }
+    ];
   }
 };
 

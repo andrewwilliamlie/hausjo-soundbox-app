@@ -151,7 +151,9 @@ export function parseKtp(words: OcrWord[]): ParsedKtp | null {
       if (labelOf(lines[i].text)) break;
       parts.push(clean(lines[i].text));
     }
-    const street = parts.filter(Boolean).join(' ');
+    const street = parts.filter(Boolean).join(' ')
+      // Hamlet numbers are Roman numerals ("DUSUN I", "DUSUN III"); OCR often reads the I as T, 1 or l.
+      .replace(/\bDUSUN\s*([IVXT1l|]{1,4})\b/g, (_m, r: string) => 'DUSUN ' + r.replace(/[T1l|]/g, 'I'));
     const rtrw = (found.rtrw?.value ?? '').replace(/[Oo]/g, '0').match(/(\d{1,3})\s*[/\\|1l]?\s*(\d{1,3})/);
     const segs = [
       street,

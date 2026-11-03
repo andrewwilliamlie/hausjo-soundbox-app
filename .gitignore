@@ -9,3 +9,6 @@ uploads
 .DS_Store
 next-env.d.ts
 *.tsbuildinfo
+
+# Generated at build time (Dockerfile)
+public/mediapipe/

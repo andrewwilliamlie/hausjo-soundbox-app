@@ -127,6 +127,11 @@ export default async function AdminPage({ searchParams }: { searchParams: Promis
                   {cur.ocrConfidence != null
                     ? <Flag bad={cur.ocrConfidence < 90 || cur.ocrEdited}>OCR e-KTP {cur.ocrConfidence}%{cur.ocrEdited ? ', dan merchant mengubah hasil OCR' : ''}. {cur.ocrConfidence < 90 || cur.ocrEdited ? 'Cocokkan NIK dengan foto KTP.' : 'Tidak diubah merchant.'}</Flag>
                     : <Flag bad={false}>Data KTP diketik merchant (OCR belum aktif). Cocokkan dengan foto KTP.</Flag>}
+                  {cur.livenessPassed != null && (
+                    <Flag bad={!cur.livenessPassed}>{cur.livenessPassed
+                      ? `Selfie diambil lewat cek wajah di HP merchant (${cur.livenessNote}). Tetap cocokkan wajah dengan foto e-KTP.`
+                      : `Selfie diunggah tanpa cek wajah: ${cur.livenessNote}. Periksa lebih teliti apakah ini foto langsung.`}</Flag>
+                  )}
                   {!cur.accountNo && <Flag bad>Merchant belum menambah rekening. Persetujuan dikunci sampai rekening ada.</Flag>}
                 </div>
 

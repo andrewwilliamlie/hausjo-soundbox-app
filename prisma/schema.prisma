@@ -114,6 +114,9 @@ model Application {
   ktpAddress    String?
   ocrConfidence Int?
   ocrEdited     Boolean @default(false)
+  livenessPassed Boolean?  // selfie taken through the on-phone liveness check (true) or uploaded without it (false)
+  livenessAt     DateTime?
+  livenessNote   String?   // e.g. "kedip, senyum · 9 dtk" or why it was skipped
 
   // Business
   hasStore     Boolean @default(true)  // APAKAH MEMILIKI TOKO FISIK?

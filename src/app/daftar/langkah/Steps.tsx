@@ -1,7 +1,9 @@
 'use client';
 
 import { useState } from 'react';
-import Icon, { IconTile, type IconName } from '@/components/Icon';
+import Icon, { IconTile } from '@/components/Icon';
+import LiveSelfie from './LiveSelfie';
+import { Upload } from './Upload';
 import { BUSINESS_TYPES } from '@/lib/provinces';
 import RegionPicker from './RegionPicker';
 import { checkBusinessName, checkNik } from '@/lib/rules';
@@ -28,80 +30,11 @@ const CONFETTI: Array<[number, string, number]> = [
   [55, '#f79009', .02], [95, '#1f5fd6', .12], [135, '#12b76a', .04], [-120, '#f79009', .15], [115, '#8db4ff', .18]
 ];
 
-/** Shrinks a phone photo to at most 1600 px on the long side (JPEG) so uploads are fast and OCR stays within limits. */
-async function shrink(file: File): Promise<File> {
-  if (!/^image\/(jpeg|png|webp)$/.test(file.type) || typeof createImageBitmap !== 'function') return file;
-  try {
-    const bmp = await createImageBitmap(file);
-    const scale = Math.min(1, 1600 / Math.max(bmp.width, bmp.height));
-    if (scale === 1 && file.size < 1.5 * 1024 * 1024) return file;
-    const canvas = document.createElement('canvas');
-    canvas.width = Math.round(bmp.width * scale);
-    canvas.height = Math.round(bmp.height * scale);
-    canvas.getContext('2d')!.drawImage(bmp, 0, 0, canvas.width, canvas.height);
-    const blob = await new Promise<Blob | null>((ok) => canvas.toBlob(ok, 'image/jpeg', 0.88));
-    return blob && blob.size < file.size ? new File([blob], 'foto.jpg', { type: 'image/jpeg' }) : file;
-  } catch {
-    return file;
-  }
-}
-
 async function post(url: string, body?: unknown) {
   const res = await fetch(url, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: body ? JSON.stringify(body) : undefined });
   const json = await res.json().catch(() => ({}));
   if (!res.ok) throw new Error(json.error || 'Terjadi kesalahan, coba lagi');
   return json;
-}
-
-export function Upload({ kind, label, done, onDone, icon = 'upload', front = false, tall = false }: {
-  kind: string; label: string; done: boolean; icon?: IconName; front?: boolean; tall?: boolean;
-  onDone: (ocr?: { fields: Partial<Data>; confidence: number } | null) => void;
-}) {
-  const [busy, setBusy] = useState(false);
-  const [error, setError] = useState('');
-  const [preview, setPreview] = useState<string | null>(null);
-  async function pick(e: React.ChangeEvent<HTMLInputElement>) {
-    const picked = e.target.files?.[0];
-    if (!picked) return;
-    setBusy(true);
-    setError('');
-    const file = await shrink(picked);
-    const local = URL.createObjectURL(file);
-    const fd = new FormData();
-    fd.append('kind', kind);
-    fd.append('file', file);
-    try {
-      const res = await fetch('/api/app/upload', { method: 'POST', body: fd });
-      const json = await res.json();
-      if (!res.ok) throw new Error(json.error || 'Gagal mengunggah');
-      setPreview(local);
-      onDone(json.ocr);
-    } catch (err) {
-      URL.revokeObjectURL(local);
-      setError((err as Error).message);
-    } finally {
-      setBusy(false);
-      e.target.value = '';
-    }
-  }
-  const cls = busy ? 'upload busy' : done ? 'upload done' : 'upload';
-  return (
-    <div style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
-      <label className={cls} style={{ minHeight: tall ? 150 : 116 }}>
-        <input type="file" accept="image/jpeg,image/png,image/webp" capture={front ? 'user' : 'environment'} onChange={pick} aria-label={label} disabled={busy} />
-        {preview && done && !busy && (
-          <img src={preview} alt="" aria-hidden="true" style={{ position: 'absolute', inset: 0, width: '100%', height: '100%', objectFit: 'cover', opacity: 0.25 }} />
-        )}
-        {busy && <span className="scanline" aria-hidden="true" />}
-        <span style={{ position: 'relative', display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 6 }}>
-          {done && !busy ? <span className="donemark"><Icon name="check" size={18} strokeWidth={3} /></span> : <Icon name={icon} size={28} />}
-          <span>{label}</span>
-          <span style={{ fontSize: 11.5, fontWeight: 500 }}>{busy ? (kind === 'KTP' ? 'Membaca e-KTP…' : 'Mengunggah…') : done ? 'Terunggah · ketuk untuk ganti' : 'Ketuk untuk ambil foto'}</span>
-        </span>
-      </label>
-      {error && <span className="err" role="alert">{error}</span>}
-    </div>
-  );
 }
 
 export default function Steps({ initial, uploaded, product }: { initial: Data; uploaded: Record<string, boolean>; product: string }) {
@@ -217,7 +150,7 @@ export default function Steps({ initial, uploaded, product }: { initial: Data; u
           <p className="hint">Foto di tempat terang, seluruh KTP terlihat, tidak buram.</p>
           <Upload kind="KTP" label="Foto e-KTP" icon="ktp" tall done={!!up.KTP} onDone={(ocr) => {
             setUp((u) => ({ ...u, KTP: true }));
-            if (ocr) { setD((x) => ({ ...x, ...ocr.fields })); setOcrFilled(true); setOcrEdited(false); }
+            if (ocr) { setD((x) => ({ ...x, ...(ocr.fields as unknown as Partial<Data>) })); setOcrFilled(true); setOcrEdited(false); }
           }} />
           {ocrFilled && <span className="okmsg fade-in" style={{ display: 'flex', gap: 6, alignItems: 'center' }}><Icon name="spark" size={16} />Terbaca otomatis. Periksa dan ubah jika ada yang salah.</span>}
           <label className="field">Nama lengkap sesuai e-KTP<input className={ocrFilled ? 'input ocr' : 'input'} value={d.ktpName} onChange={(e) => set('ktpName', e.target.value.toUpperCase())} /></label>
@@ -238,7 +171,7 @@ export default function Steps({ initial, uploaded, product }: { initial: Data; u
               </span>
             ))}
           </div>
-          <Upload kind="SELFIE" label="Selfie dengan e-KTP" icon="selfie" front done={!!up.SELFIE} onDone={() => setUp((u) => ({ ...u, SELFIE: true }))} />
+          <LiveSelfie done={!!up.SELFIE} onDone={() => setUp((u) => ({ ...u, SELFIE: true }))} />
         </div>
       )}
 

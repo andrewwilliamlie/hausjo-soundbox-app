@@ -11,6 +11,10 @@ RUN apk add --no-cache libc6-compat openssl
 COPY --from=deps /app/node_modules ./node_modules
 COPY . .
 ENV NEXT_TELEMETRY_DISABLED=1
+# Self-host the face-check engine (WASM) and model so merchant phones only talk to our own server
+RUN mkdir -p public/mediapipe && cp -r node_modules/@mediapipe/tasks-vision/wasm public/mediapipe/wasm \
+ && node -e "fetch('https://storage.googleapis.com/mediapipe-models/face_landmarker/face_landmarker/float16/1/face_landmarker.task').then(async r=>{if(!r.ok)throw new Error('model '+r.status);require('fs').writeFileSync('public/mediapipe/face_landmarker.task',Buffer.from(await r.arrayBuffer()))})" \
+ && ls -la public/mediapipe public/mediapipe/wasm
 RUN npx prisma generate && npx next build
 
 FROM node:22-alpine AS run

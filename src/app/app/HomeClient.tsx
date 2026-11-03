@@ -5,7 +5,7 @@ import { useEffect, useRef, useState, useTransition } from 'react';
 import Icon, { IconTile, type IconName } from '@/components/Icon';
 import SoundboxArt from '@/components/SoundboxArt';
 import { BANKS, MARKETPLACES } from '@/lib/provinces';
-import { Upload } from '../daftar/langkah/Steps';
+import { Upload } from '../daftar/langkah/Upload';
 import { saveBank, setSoundbox, submitSerial, type Result } from './actions';
 
 type AppView = {
