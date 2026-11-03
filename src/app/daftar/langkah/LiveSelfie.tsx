@@ -84,6 +84,10 @@ export default function LiveSelfie({ done, onDone }: { done: boolean; onDone: ()
     stream.current = null;
   }
   useEffect(() => stop, []);
+  // Start downloading the face-check engine (~13 MB, cached afterwards) while the merchant is still on the KTP part.
+  useEffect(() => {
+    if (!done) getLandmarker().catch(() => {});
+  }, [done]);
 
   function fail(msg: string) {
     stop();
