@@ -131,6 +131,7 @@ model Application {
   city         String? // KOTA / KABUPATEN
   province     String?
   postalCode   String? // KODE POS
+  villageCode  String? // Kemendagri kelurahan/desa code, e.g. 32.73.01.1001
   lat          Float?
   lng          Float?
   turnover     String  @default("UMI") // KATEGORI USAHA BERDASARKAN OMZET

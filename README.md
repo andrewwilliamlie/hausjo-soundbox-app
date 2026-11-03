@@ -44,3 +44,8 @@ Restore photos: `docker cp` the archive into `hausjo-app-1` and extract it into 
 ## Admin accounts
 
 The first admin comes from `INITIAL_ADMIN_EMAIL`/`INITIAL_ADMIN_PASSWORD`. Everyone else is added at **/admin/tim** (ADMIN role) and gets a one-time temporary password by email and on screen; they must set their own on first login. Roles: Pemeriksa (review), Aktivasi & pengiriman (bank IDs, sticker, shipping), Admin (everything + team + backups).
+
+## Region dropdowns
+
+`public/wilayah/` holds province → kota/kabupaten → kecamatan → kelurahan/desa lists with postal codes (38 provinces, 514 cities, 7,285 districts, 83,762 villages; Kepmendagri 2025, MIT-licensed data by cahyadsn). To refresh after a new decree, clone `cahyadsn/wilayah` and `cahyadsn/wilayah_kodepos` and run
+`python3 scripts/build-wilayah.py <wilayah>/db/wilayah.sql <wilayah_kodepos>/json/wilayah_kodepos.min.json public/wilayah`.

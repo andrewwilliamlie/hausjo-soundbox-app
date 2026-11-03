@@ -116,7 +116,7 @@ export default async function AdminPage({ searchParams }: { searchParams: Promis
                     {kv('WhatsApp', cur.user.phone)}
                     {kv('Email', cur.user.email)}
                     {kv('Produk', `${cur.product === 'SOUNDBOX' ? 'Soundbox QRIS' : 'QRIS saja'} · ${SB_LABEL[cur.soundboxStatus]}${cur.orderNo ? ' · ' + cur.marketplace + ' ' + cur.orderNo : ''}${cur.salesName ? ' · ' + cur.salesName : ''}`)}
-                    {kv('Alamat', `${cur.street ?? ''} ${cur.number ?? ''} RT ${cur.rt ?? '-'}/RW ${cur.rw ?? '-'}, ${cur.kelurahan}, ${cur.kecamatan}, ${cur.city}, ${cur.province} ${cur.postalCode ?? ''}`)}
+                    {kv('Alamat', `${cur.street ?? ''} ${cur.number ?? ''} RT ${cur.rt ?? '-'}/RW ${cur.rw ?? '-'}, ${cur.kelurahan}, ${cur.kecamatan}, ${cur.city}, ${cur.province} ${cur.postalCode ?? ''}${cur.villageCode ? ' · kode wilayah ' + cur.villageCode : ' · diketik manual'}`)}
                     {kv('Toko', `${cur.hasStore ? 'Punya toko' : 'Tidak punya toko'} · ${cur.businessType ?? ''}`)}
                     {kv('Rekening', cur.accountNo ? `${cur.bankName} ${cur.accountNo} a.n. ${cur.accountHolder}` : 'Belum ditambahkan')}
                     {kv('Pencairan', cur.settlement === 'H1' ? 'H+1' : 'Hari yang sama')}

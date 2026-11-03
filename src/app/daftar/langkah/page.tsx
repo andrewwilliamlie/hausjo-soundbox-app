@@ -41,6 +41,7 @@ export default async function LangkahPage() {
           city: app.city ?? '',
           province: app.province ?? '',
           postalCode: app.postalCode ?? '',
+          villageCode: app.villageCode ?? '',
           lat: app.lat,
           lng: app.lng,
           turnover: app.turnover

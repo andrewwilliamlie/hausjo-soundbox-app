@@ -5,7 +5,11 @@ const nextConfig = {
   experimental: {
     serverActions: { bodySizeLimit: '12mb' }
   },
-  poweredByHeader: false
+  poweredByHeader: false,
+  // Region lists change only with a new Kemendagri decree; let phones cache them for a day.
+  async headers() {
+    return [{ source: '/wilayah/:file*', headers: [{ key: 'Cache-Control', value: 'public, max-age=86400, stale-while-revalidate=604800' }] }];
+  }
 };
 
 export default nextConfig;

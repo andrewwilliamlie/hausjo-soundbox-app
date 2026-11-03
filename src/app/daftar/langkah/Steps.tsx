@@ -2,7 +2,8 @@
 
 import { useState } from 'react';
 import Icon, { IconTile, type IconName } from '@/components/Icon';
-import { BUSINESS_TYPES, PROVINCES } from '@/lib/provinces';
+import { BUSINESS_TYPES } from '@/lib/provinces';
+import RegionPicker from './RegionPicker';
 import { checkBusinessName, checkNik } from '@/lib/rules';
 
 type Data = {
@@ -10,7 +11,7 @@ type Data = {
   ocrConfidence: number | null;
   hasStore: boolean; sellsOffline: boolean; sellsOnline: boolean; onlineLink: string;
   businessType: string; businessName: string;
-  street: string; number: string; rt: string; rw: string; kelurahan: string; kecamatan: string; city: string; province: string; postalCode: string;
+  street: string; number: string; rt: string; rw: string; kelurahan: string; kecamatan: string; city: string; province: string; postalCode: string; villageCode: string;
   lat: number | null; lng: number | null; turnover: string;
 };
 
@@ -123,7 +124,9 @@ export default function Steps({ initial, uploaded, product }: { initial: Data; u
     if (s === 2) {
       if (!d.businessType) return 'Pilih jenis usaha';
       if (!name.ok) return 'Periksa nama usaha: ' + name.message;
-      if (!d.street.trim() || !d.kelurahan.trim() || !d.kecamatan.trim() || !d.city.trim() || !d.province) return 'Lengkapi alamat toko';
+      if (!d.province || !d.city || !d.kecamatan || !d.villageCode) return 'Pilih provinsi, kota, kecamatan dan kelurahan/desa dari daftar';
+      if (!/^\d{5}$/.test(d.postalCode)) return 'Kode pos harus 5 angka';
+      if (!d.street.trim()) return 'Isi nama jalan toko';
       if (!up.STORE_FRONT || !up.PRODUCT) return 'Unggah foto depan toko dan foto produk';
       if (d.sellsOnline && !d.onlineLink.trim()) return 'Isi link toko online';
     }
@@ -249,18 +252,10 @@ export default function Steps({ initial, uploaded, product }: { initial: Data; u
           <h2 className="h2" style={{ fontSize: 15, marginTop: 6 }}>Alamat toko</h2>
           <button type="button" className="btn btn-ghost" onClick={locate} style={{ gap: 8 }}><Icon name="pin" size={18} />Gunakan lokasi saya sekarang</button>
           {locMsg && <span className={d.lat != null ? 'okmsg' : 'hint'}>{locMsg}</span>}
-          <label className="field">Provinsi
-            <select className="input" value={d.province} onChange={(e) => set('province', e.target.value)}>
-              <option value="">Pilih provinsi</option>
-              {PROVINCES.map((p) => <option key={p}>{p}</option>)}
-            </select>
-          </label>
-          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(2, minmax(0, 1fr))', gap: 10 }}>
-            <label className="field">Kota / Kabupaten<input className="input" value={d.city} onChange={(e) => set('city', e.target.value)} /></label>
-            <label className="field">Kecamatan<input className="input" value={d.kecamatan} onChange={(e) => set('kecamatan', e.target.value)} /></label>
-            <label className="field">Kelurahan / Desa<input className="input" value={d.kelurahan} onChange={(e) => set('kelurahan', e.target.value)} /></label>
-            <label className="field">Kode pos<input className="input" inputMode="numeric" value={d.postalCode} onChange={(e) => set('postalCode', e.target.value)} /></label>
-          </div>
+          <RegionPicker
+            value={{ province: d.province, city: d.city, kecamatan: d.kecamatan, kelurahan: d.kelurahan, postalCode: d.postalCode, villageCode: d.villageCode }}
+            onChange={(v) => setD((x) => ({ ...x, ...v }))}
+          />
           <label className="field">Nama jalan<input className="input" value={d.street} onChange={(e) => set('street', e.target.value)} placeholder="Jl. ..." /></label>
           <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, minmax(0, 1fr))', gap: 10 }}>
             <label className="field">No / Blok<input className="input" value={d.number} onChange={(e) => set('number', e.target.value)} /></label>
