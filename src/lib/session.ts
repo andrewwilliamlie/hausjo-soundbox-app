@@ -48,14 +48,20 @@ export async function startAdminSession(adminId: string) {
   (await cookies()).set(ADMIN_COOKIE, await sign({ sub: adminId, t: 'a' }, ADMIN_MAX_AGE), cookieOpts(ADMIN_MAX_AGE));
 }
 
-export async function merchantId(): Promise<string | null> {
-  const p = await read(MERCHANT_COOKIE);
-  return p && p.t === 'm' && typeof p.sub === 'string' ? p.sub : null;
+export type SessionInfo = { id: string; issuedAt: number }; // issuedAt in ms
+
+async function info(name: string, t: string): Promise<SessionInfo | null> {
+  const p = await read(name);
+  if (!p || p.t !== t || typeof p.sub !== 'string') return null;
+  return { id: p.sub, issuedAt: typeof p.iat === 'number' ? p.iat * 1000 : 0 };
 }
 
-export async function adminId(): Promise<string | null> {
-  const p = await read(ADMIN_COOKIE);
-  return p && p.t === 'a' && typeof p.sub === 'string' ? p.sub : null;
+export const merchantSession = () => info(MERCHANT_COOKIE, 'm');
+export const adminSession = () => info(ADMIN_COOKIE, 'a');
+
+/** True when the session was issued before the password last changed (JWT iat has 1 s precision). */
+export function staleSession(s: SessionInfo, changedAt: Date | null) {
+  return !!changedAt && s.issuedAt + 1000 < changedAt.getTime();
 }
 
 export async function endMerchantSession() {

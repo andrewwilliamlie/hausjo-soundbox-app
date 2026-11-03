@@ -1,6 +1,6 @@
 import Link from 'next/link';
 import { redirect } from 'next/navigation';
-import { merchantId } from '@/lib/session';
+import { merchantId } from '@/lib/auth';
 import DaftarForm from './DaftarForm';
 
 export const metadata = { title: 'Daftar merchant · HausJo' };

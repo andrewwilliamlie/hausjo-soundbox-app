@@ -1,7 +1,7 @@
 import { NextResponse } from 'next/server';
 import { z } from 'zod';
 import { db } from '@/lib/db';
-import { merchantId } from '@/lib/session';
+import { merchantId } from '@/lib/auth';
 
 // Fields a merchant may set during signup (DRAFT only). Admin-only fields are never accepted here.
 const fields = z

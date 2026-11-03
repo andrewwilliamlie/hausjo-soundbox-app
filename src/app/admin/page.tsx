@@ -3,8 +3,10 @@ import type { Prisma } from '@prisma/client';
 import { requireAdmin } from '@/lib/auth';
 import { db } from '@/lib/db';
 import { checkBusinessName } from '@/lib/rules';
+import AdminHeader from './AdminHeader';
+import ResetLink from './ResetLink';
 import {
-  activate, adminLogout, approve, decideDoc, markGuided, markSoundboxPaid, saveClassification, sendRevision, ship
+  activate, approve, decideDoc, markGuided, markSoundboxPaid, saveClassification, sendRevision, ship
 } from './actions';
 
 export const dynamic = 'force-dynamic';
@@ -73,13 +75,7 @@ export default async function AdminPage({ searchParams }: { searchParams: Promis
 
   return (
     <div className="admin">
-      <header className="admin-top">
-        <strong style={{ fontSize: 18 }}>HAUS<span style={{ color: '#8db4ff' }}>JO</span> <span style={{ fontWeight: 500, fontSize: 13, color: '#bfd4ff' }}>Admin · Antrean pemeriksaan</span></strong>
-        <form action={adminLogout} style={{ display: 'flex', gap: 12, alignItems: 'center', fontSize: 13 }}>
-          <span style={{ color: '#dce6fa' }}>{admin.name} · {admin.role}</span>
-          <button style={{ background: 'none', border: '1px solid #8db4ff', color: '#fff', borderRadius: 8, padding: '6px 10px', cursor: 'pointer' }}>Keluar</button>
-        </form>
-      </header>
+      <AdminHeader admin={admin} tab="antrean" />
 
       <div className="admin-wrap">
         <div style={{ display: 'flex', flexWrap: 'wrap', gap: 12, justifyContent: 'space-between', alignItems: 'center' }}>
@@ -216,6 +212,8 @@ export default async function AdminPage({ searchParams }: { searchParams: Promis
                     </div>
                   </form>
                 )}
+
+                <ResetLink key={cur.id} id={cur.id} phone={cur.user.phone} />
 
                 {cur.needsGuide && !cur.guidedAt && (
                   <form action={markGuided} className="card" style={{ gap: 12, background: '#fffcf5', borderColor: '#fec84b' }}>

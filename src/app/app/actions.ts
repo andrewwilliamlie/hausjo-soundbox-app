@@ -3,7 +3,7 @@
 import { revalidatePath } from 'next/cache';
 import { z } from 'zod';
 import { db } from '@/lib/db';
-import { merchantId } from '@/lib/session';
+import { merchantId } from '@/lib/auth';
 
 export type Result = { ok: boolean; error?: string; message?: string };
 

@@ -15,7 +15,8 @@ RUN npx prisma generate && npx next build
 
 FROM node:22-alpine AS run
 WORKDIR /app
-RUN apk add --no-cache openssl && addgroup -S app && adduser -S app -G app
+# postgresql16-client provides pg_dump for the daily database backup (server is Postgres 16)
+RUN apk add --no-cache openssl postgresql16-client tar && addgroup -S app && adduser -S app -G app
 ENV NODE_ENV=production NEXT_TELEMETRY_DISABLED=1 PORT=3000 HOSTNAME=0.0.0.0
 COPY --from=build /app/.next/standalone ./
 COPY --from=build /app/.next/static ./.next/static

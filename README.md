@@ -26,3 +26,21 @@ npm install
 npx prisma db push
 npm run dev
 ```
+
+## Cadangan & pemulihan
+
+- The app dumps the database every day around 02:00 WIB (`pg_dump --format=custom`) to `/data/uploads/.backups` on the `uploads` volume and keeps the newest 14. An ADMIN can run one by hand and download dumps or a `.tar.gz` of all photos at **/admin/cadangan**. Download both weekly and keep them in a restricted company Drive folder: they contain merchant personal data.
+- Hostinger VPS backups/snapshots cover the whole server as a second layer.
+
+Restore a database dump (overwrites current data), from the VPS terminal:
+
+```sh
+docker cp hausjo-db-YYYYMMDD-HHMM.dump hausjo-db-1:/tmp/restore.dump
+docker exec hausjo-db-1 pg_restore -U hausjo -d hausjo --clean --if-exists --no-owner /tmp/restore.dump
+```
+
+Restore photos: `docker cp` the archive into `hausjo-app-1` and extract it into `/data/uploads` with `tar -xzf`.
+
+## Admin accounts
+
+The first admin comes from `INITIAL_ADMIN_EMAIL`/`INITIAL_ADMIN_PASSWORD`. Everyone else is added at **/admin/tim** (ADMIN role) and gets a one-time temporary password by email and on screen; they must set their own on first login. Roles: Pemeriksa (review), Aktivasi & pengiriman (bank IDs, sticker, shipping), Admin (everything + team + backups).

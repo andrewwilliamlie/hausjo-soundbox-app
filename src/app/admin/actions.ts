@@ -7,6 +7,7 @@ import { audit, requireAdmin } from '@/lib/auth';
 import { db } from '@/lib/db';
 import { mails, sendMail } from '@/lib/mail';
 import { checkBusinessName } from '@/lib/rules';
+import { createResetLink } from '@/lib/reset';
 import { endAdminSession, startAdminSession } from '@/lib/session';
 import { MAX_UPLOAD_BYTES, allowedMime, readUpload, saveUpload } from '@/lib/storage';
 
@@ -23,9 +24,11 @@ export async function adminLogin(_prev: { error: string | null }, form: FormData
   const password = String(form.get('password') || '');
   const admin = await db.admin.findUnique({ where: { email } });
   if (!admin || !(await bcrypt.compare(password, admin.passwordHash))) return { error: 'Email atau kata sandi salah' };
+  if (!admin.active) return { error: 'Akun ini dinonaktifkan. Hubungi admin HausJo.' };
+  await db.admin.update({ where: { id: admin.id }, data: { lastLoginAt: new Date() } });
   await startAdminSession(admin.id);
   await audit(admin.id, 'LOGIN');
-  redirect('/admin');
+  redirect(admin.mustChangePassword ? '/admin/akun' : '/admin');
 }
 
 export async function adminLogout() {
@@ -164,4 +167,17 @@ export async function markSoundboxPaid(form: FormData) {
   await db.application.update({ where: { id }, data: { soundboxPaidAt: new Date() } });
   await audit(admin.id, 'SOUNDBOX_PAID', id);
   back(id);
+}
+
+export type ResetLinkState = { error: string | null; link?: string; hours?: number };
+
+/** Emails the merchant a 24-hour link to set a new password and returns it so CS can also send it by WhatsApp. */
+export async function sendMerchantReset(_prev: ResetLinkState, form: FormData): Promise<ResetLinkState> {
+  const admin = await requireAdmin();
+  const app = await db.application.findUnique({ where: { id: String(form.get('id')) } });
+  if (!app) return { error: 'Pendaftaran tidak ditemukan' };
+  const r = await createResetLink(app.userId, admin.id);
+  if (!r) return { error: 'Gagal membuat link' };
+  await audit(admin.id, 'MERCHANT_RESET_LINK', app.id);
+  return { error: null, link: r.link, hours: r.hours };
 }

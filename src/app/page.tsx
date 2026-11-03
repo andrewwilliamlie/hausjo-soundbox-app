@@ -75,6 +75,11 @@ export default function Home() {
         <p className="hint" style={{ textAlign: 'center', display: 'flex', gap: 6, justifyContent: 'center', alignItems: 'center' }}>
           <Icon name="shield" size={16} /> Diproses bersama BCA dan Nobu Bank. Data Anda hanya untuk pendaftaran merchant.
         </p>
+        <nav className="legal-links" aria-label="Informasi">
+          <Link href="/syarat-ketentuan">Syarat &amp; Ketentuan</Link>
+          <Link href="/kebijakan-privasi">Kebijakan Privasi</Link>
+          <span className="hint">© PT Hausjo Digital Pro</span>
+        </nav>
       </main>
     </div>
   );

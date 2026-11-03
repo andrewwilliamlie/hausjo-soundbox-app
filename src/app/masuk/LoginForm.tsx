@@ -17,7 +17,7 @@ export default function LoginForm() {
       </label>
       {state.error && <p className="err" role="alert">{state.error}</p>}
       <button type="submit" className="btn btn-primary btn-block" disabled={pending}>{pending ? 'Masuk…' : 'Masuk'}</button>
-      <p className="hint">Lupa kata sandi? Hubungi CS HausJo, admin akan membantu atur ulang.</p>
+      <p className="hint"><Link href="/masuk/lupa" style={{ fontWeight: 700 }}>Lupa kata sandi?</Link></p>
       <p className="hint">Belum punya akun? <Link href="/daftar" style={{ fontWeight: 700 }}>Daftar</Link></p>
     </form>
   );

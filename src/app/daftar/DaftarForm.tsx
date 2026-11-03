@@ -62,6 +62,7 @@ export default function DaftarForm({ initialProduct }: { initialProduct: 'soundb
 
       {state.error && <p className="err" role="alert">{state.error}</p>}
       <button type="submit" className="btn btn-primary btn-block" disabled={pending}>{pending ? 'Membuat akun…' : 'Daftar'}</button>
+      <p className="hint">Dengan mendaftar, Anda menyetujui <Link href="/syarat-ketentuan" target="_blank" style={{ fontWeight: 700 }}>Syarat &amp; Ketentuan</Link> dan <Link href="/kebijakan-privasi" target="_blank" style={{ fontWeight: 700 }}>Kebijakan Privasi</Link> HausJo.</p>
       <p className="hint">Sudah punya akun? <Link href="/masuk" style={{ fontWeight: 700 }}>Masuk</Link></p>
     </form>
   );

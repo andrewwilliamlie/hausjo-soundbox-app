@@ -1,7 +1,7 @@
 import { NextResponse } from 'next/server';
 import { db } from '@/lib/db';
 import { readKtp } from '@/lib/ocr';
-import { merchantId } from '@/lib/session';
+import { merchantId } from '@/lib/auth';
 import { MAX_UPLOAD_BYTES, allowedMime, saveUpload } from '@/lib/storage';
 
 const MERCHANT_KINDS = ['KTP', 'SELFIE', 'STORE_FRONT', 'PRODUCT'] as const;

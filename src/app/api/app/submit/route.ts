@@ -2,7 +2,7 @@ import { NextResponse } from 'next/server';
 import { db } from '@/lib/db';
 import { mails, sendMail } from '@/lib/mail';
 import { checkBusinessName, checkNik } from '@/lib/rules';
-import { merchantId } from '@/lib/session';
+import { merchantId } from '@/lib/auth';
 
 export async function POST() {
   const uid = await merchantId();
