@@ -28,6 +28,24 @@ const CONFETTI: Array<[number, string, number]> = [
   [55, '#f79009', .02], [95, '#1f5fd6', .12], [135, '#12b76a', .04], [-120, '#f79009', .15], [115, '#8db4ff', .18]
 ];
 
+/** Shrinks a phone photo to at most 1600 px on the long side (JPEG) so uploads are fast and OCR stays within limits. */
+async function shrink(file: File): Promise<File> {
+  if (!/^image\/(jpeg|png|webp)$/.test(file.type) || typeof createImageBitmap !== 'function') return file;
+  try {
+    const bmp = await createImageBitmap(file);
+    const scale = Math.min(1, 1600 / Math.max(bmp.width, bmp.height));
+    if (scale === 1 && file.size < 1.5 * 1024 * 1024) return file;
+    const canvas = document.createElement('canvas');
+    canvas.width = Math.round(bmp.width * scale);
+    canvas.height = Math.round(bmp.height * scale);
+    canvas.getContext('2d')!.drawImage(bmp, 0, 0, canvas.width, canvas.height);
+    const blob = await new Promise<Blob | null>((ok) => canvas.toBlob(ok, 'image/jpeg', 0.88));
+    return blob && blob.size < file.size ? new File([blob], 'foto.jpg', { type: 'image/jpeg' }) : file;
+  } catch {
+    return file;
+  }
+}
+
 async function post(url: string, body?: unknown) {
   const res = await fetch(url, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: body ? JSON.stringify(body) : undefined });
   const json = await res.json().catch(() => ({}));
@@ -43,10 +61,11 @@ export function Upload({ kind, label, done, onDone, icon = 'upload', front = fal
   const [error, setError] = useState('');
   const [preview, setPreview] = useState<string | null>(null);
   async function pick(e: React.ChangeEvent<HTMLInputElement>) {
-    const file = e.target.files?.[0];
-    if (!file) return;
+    const picked = e.target.files?.[0];
+    if (!picked) return;
     setBusy(true);
     setError('');
+    const file = await shrink(picked);
     const local = URL.createObjectURL(file);
     const fd = new FormData();
     fd.append('kind', kind);

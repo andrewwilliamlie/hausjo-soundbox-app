@@ -42,7 +42,8 @@ export async function POST(req: Request) {
   }
 
   let ocr = null;
-  if (kind === 'KTP') {
+  // OCR only while the merchant is still filling in the form; it never overwrites data the team has reviewed.
+  if (kind === 'KTP' && app.status === 'DRAFT') {
     ocr = await readKtp(Buffer.from(await file.arrayBuffer()), file.type);
     if (ocr) {
       await db.application.update({ where: { id: app.id }, data: { ...ocr.fields, ocrConfidence: ocr.confidence, ocrEdited: false } });

@@ -49,3 +49,7 @@ The first admin comes from `INITIAL_ADMIN_EMAIL`/`INITIAL_ADMIN_PASSWORD`. Every
 
 `public/wilayah/` holds province → kota/kabupaten → kecamatan → kelurahan/desa lists with postal codes (38 provinces, 514 cities, 7,285 districts, 83,762 villages; Kepmendagri 2025, MIT-licensed data by cahyadsn). To refresh after a new decree, clone `cahyadsn/wilayah` and `cahyadsn/wilayah_kodepos` and run
 `python3 scripts/build-wilayah.py <wilayah>/db/wilayah.sql <wilayah_kodepos>/json/wilayah_kodepos.min.json public/wilayah`.
+
+## KTP OCR (Google Cloud Vision)
+
+Set `OCR_PROVIDER=google` and `OCR_API_KEY` (API key restricted to the Cloud Vision API) in the Docker project's environment. On upload of the e-KTP photo during signup, `src/lib/ocr.ts` calls Vision `DOCUMENT_TEXT_DETECTION` and `src/lib/ktp-parse.ts` reads NIK, nama, tempat/tgl lahir, jenis kelamin, alamat (with RT/RW, kel., kec., city), agama and pekerjaan from the word positions. Any error or timeout falls back to manual typing. Confidence below 90 or a merchant edit is flagged to reviewers. Photos are shrunk to 1600 px in the browser before upload.

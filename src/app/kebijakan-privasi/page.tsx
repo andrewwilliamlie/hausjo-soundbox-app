@@ -39,7 +39,7 @@ const sections: Section[] = [
     p: ['Data hanya dibagikan sebatas yang diperlukan untuk tujuan di atas, kepada:'],
     list: [
       'Bank dan penyelenggara jasa pembayaran mitra yang menerbitkan QRIS Anda, yaitu PT Bank Central Asia Tbk (BCA), PT Bank Nationalnobu Tbk (Nobu Bank), atau PT Bayarind (Bayarind), sesuai bank yang dipilih untuk pendaftaran Anda.',
-      'Penyedia layanan yang bekerja atas nama kami: penyedia server dan penyimpanan data, layanan email, penyedia pembayaran untuk pembelian Soundbox, kurir pengiriman, dan, bila diaktifkan, layanan pembacaan otomatis e-KTP (OCR). Mereka hanya boleh memakai data sesuai instruksi kami.',
+      'Penyedia layanan yang bekerja atas nama kami: penyedia server dan penyimpanan data, layanan email, penyedia pembayaran untuk pembelian Soundbox, kurir pengiriman, dan layanan pembacaan otomatis e-KTP (OCR, saat ini Google Cloud Vision, yang dapat memproses foto di luar wilayah Indonesia). Mereka hanya boleh memakai data sesuai instruksi kami.',
       'Otoritas yang berwenang, seperti Bank Indonesia, aparat penegak hukum, atau lembaga lain, bila diwajibkan oleh peraturan perundang-undangan.'
     ]
   },
