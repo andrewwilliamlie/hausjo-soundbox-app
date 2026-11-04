@@ -1,6 +1,7 @@
 'use server';
 
 import bcrypt from 'bcryptjs';
+import { cookies } from 'next/headers';
 import { redirect } from 'next/navigation';
 import { db } from '@/lib/db';
 import { normalisePhone } from '@/lib/rules';
@@ -19,6 +20,11 @@ export async function login(_prev: LoginState, form: FormData): Promise<LoginSta
     return { error: 'Nomor/email atau kata sandi salah' };
   }
   await startMerchantSession(user.id);
+  // Remember the store name on this phone so the welcome screen can greet it next time.
+  const app = await db.application.findFirst({ where: { userId: user.id }, orderBy: { createdAt: 'desc' }, select: { businessName: true } });
+  if (app?.businessName) {
+    (await cookies()).set('hj_last', app.businessName.slice(0, 40), { httpOnly: true, sameSite: 'lax', secure: process.env.NODE_ENV === 'production', path: '/', maxAge: 60 * 60 * 24 * 365 });
+  }
   redirect('/app');
 }
 

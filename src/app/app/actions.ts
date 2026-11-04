@@ -77,3 +77,18 @@ export async function submitSerial(serial: string): Promise<Result> {
   revalidatePath('/app');
   return { ok: true, message: 'SN tercatat. CS HausJo akan menghubungi Anda untuk panduan aktivasi.' };
 }
+
+export async function changeMerchantPassword(input: { current: string; next: string; again: string }): Promise<Result> {
+  const uid = await merchantId();
+  if (!uid) return { ok: false, error: 'Silakan masuk lagi' };
+  const user = await db.user.findUnique({ where: { id: uid } });
+  if (!user) return { ok: false, error: 'Silakan masuk lagi' };
+  const bcrypt = (await import('bcryptjs')).default;
+  if (!(await bcrypt.compare(input.current, user.passwordHash))) return { ok: false, error: 'Kata sandi saat ini salah' };
+  if (input.next.length < 8) return { ok: false, error: 'Kata sandi baru minimal 8 karakter' };
+  if (input.next !== input.again) return { ok: false, error: 'Ulangi kata sandi baru dengan sama persis' };
+  await db.user.update({ where: { id: uid }, data: { passwordHash: await bcrypt.hash(input.next, 12), passwordChangedAt: new Date(Date.now() - 2000) } });
+  const { startMerchantSession } = await import('@/lib/session');
+  await startMerchantSession(uid); // this phone stays signed in; other devices are signed out
+  return { ok: true, message: 'Kata sandi baru tersimpan' };
+}

@@ -14,7 +14,7 @@ export default function ForgotForm() {
         <h1 style={{ margin: 0, fontSize: 22, fontWeight: 800 }}>Cek email Anda</h1>
         <p className="hint" style={{ fontSize: 14 }}>Jika nomor atau email itu terdaftar, link untuk membuat kata sandi baru sudah kami kirim ke email akun. Link berlaku 1 jam. Cek juga folder Spam.</p>
         <p className="hint">Tidak bisa membuka email? Hubungi CS HausJo, admin bisa mengirim link lewat WhatsApp.</p>
-        <Link href="/masuk" className="btn btn-ghost btn-block">Kembali ke Masuk</Link>
+        <Link href="/masuk?form=1" className="btn btn-ghost btn-block">Kembali ke Masuk</Link>
       </div>
     );
   }
@@ -26,7 +26,7 @@ export default function ForgotForm() {
       <label className="field">Nomor WhatsApp atau email<input className="input" name="id" autoComplete="username" required /></label>
       {state.error && <p className="err" role="alert">{state.error}</p>}
       <button type="submit" className="btn btn-primary btn-block" disabled={pending} style={{ gap: 8 }}>{pending ? 'Mengirim…' : <>Kirim link <Icon name="chevron" size={18} /></>}</button>
-      <p className="hint"><Link href="/masuk" style={{ fontWeight: 700 }}>Kembali ke Masuk</Link></p>
+      <p className="hint"><Link href="/masuk?form=1" style={{ fontWeight: 700 }}>Kembali ke Masuk</Link></p>
     </form>
   );
 }
