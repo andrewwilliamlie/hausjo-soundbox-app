@@ -11,7 +11,7 @@ import { tempPassword } from '@/lib/passwords';
 export type TeamState = { error: string | null; done?: string; temp?: string; who?: string };
 
 const ROLES = ['REVIEWER', 'ACTIVATION', 'ADMIN'] as const;
-const APP = () => process.env.APP_URL || 'https://beta.hausjo.co.id';
+const APP = () => process.env.APP_URL || 'https://app.aipos.co.id';
 
 function welcomeMail(name: string, email: string, temp: string, reset: boolean) {
   return {

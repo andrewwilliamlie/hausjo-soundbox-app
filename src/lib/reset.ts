@@ -2,7 +2,7 @@ import { db } from './db';
 import { sendMail } from './mail';
 import { newToken } from './passwords';
 
-const APP = () => process.env.APP_URL || 'https://beta.hausjo.co.id';
+const APP = () => process.env.APP_URL || 'https://app.aipos.co.id';
 
 /**
  * Creates a one-time link to set a new password and emails it to the merchant.

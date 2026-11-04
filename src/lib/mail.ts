@@ -32,7 +32,7 @@ export async function sendMail(to: string, subject: string, text: string, attach
   }
 }
 
-const APP = () => process.env.APP_URL || 'https://beta.hausjo.co.id';
+const APP = () => process.env.APP_URL || 'https://app.aipos.co.id';
 
 export const mails = {
   submitted: (ticket: string) => ({

@@ -2,7 +2,7 @@ import LegalPage, { type Section } from '@/components/LegalPage';
 
 export const metadata = { title: 'Kebijakan Privasi · AIPOS' };
 
-const CONTACT = 'support@aipos.co.id';
+const CONTACT = 'cs@aipos.co.id';
 
 const sections: Section[] = [
   {

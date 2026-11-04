@@ -24,7 +24,7 @@ services:
     environment:
       DATABASE_URL: postgresql://hausjo:${DB_PASSWORD}@db:5432/hausjo
       SESSION_SECRET: ${SESSION_SECRET}
-      APP_URL: ${APP_URL:-https://beta.hausjo.co.id}
+      APP_URL: ${APP_URL:-https://app.aipos.co.id}
       UPLOAD_DIR: /data/uploads
       SMTP_HOST: ${SMTP_HOST:-smtp.gmail.com}
       SMTP_PORT: ${SMTP_PORT:-465}
@@ -46,7 +46,7 @@ services:
     ports:
       - "80:80"
       - "443:443"
-    command: caddy reverse-proxy --from ${APP_DOMAIN:-beta.hausjo.co.id} --to app:3000
+    command: caddy reverse-proxy --from ${APP_DOMAIN:-app.aipos.co.id} --to app:3000
     volumes:
       - caddy_data:/data
 

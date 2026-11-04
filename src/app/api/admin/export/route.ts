@@ -45,7 +45,7 @@ export async function GET(req: Request) {
   ws.addRow(COLUMNS);
   ws.getRow(1).font = { bold: true };
   ws.getRow(1).alignment = { wrapText: true, vertical: 'middle' };
-  const appUrl = process.env.APP_URL || 'https://beta.hausjo.co.id';
+  const appUrl = process.env.APP_URL || 'https://app.aipos.co.id';
 
   for (const a of apps) {
     const nmid = a.nmid ?? '';

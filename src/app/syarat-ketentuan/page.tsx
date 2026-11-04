@@ -79,7 +79,7 @@ const sections: Section[] = [
   {
     h: 'Hukum yang berlaku dan pengaduan',
     p: [
-      'Syarat & Ketentuan ini tunduk pada hukum Republik Indonesia. Pertanyaan dan pengaduan dapat dikirim ke support@aipos.co.id. Perselisihan diselesaikan lebih dulu secara musyawarah; bila tidak tercapai, melalui lembaga penyelesaian sengketa atau pengadilan yang berwenang di Indonesia.'
+      'Syarat & Ketentuan ini tunduk pada hukum Republik Indonesia. Pertanyaan dan pengaduan dapat dikirim ke cs@aipos.co.id. Perselisihan diselesaikan lebih dulu secara musyawarah; bila tidak tercapai, melalui lembaga penyelesaian sengketa atau pengadilan yang berwenang di Indonesia.'
     ]
   },
   {
