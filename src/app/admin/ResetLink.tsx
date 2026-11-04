@@ -8,7 +8,7 @@ export default function ResetLink({ id, phone }: { id: string; phone: string }) 
   const [state, action, pending] = useActionState<ResetLinkState, FormData>(sendMerchantReset, { error: null });
   const [copied, setCopied] = useState(false);
   const wa = state.link
-    ? `https://wa.me/62${phone.replace(/^0/, '')}?text=${encodeURIComponent(`Halo, ini link HausJo untuk membuat kata sandi baru (berlaku ${state.hours} jam, sekali pakai):\n${state.link}`)}`
+    ? `https://wa.me/62${phone.replace(/^0/, '')}?text=${encodeURIComponent(`Halo, ini link AIPOS untuk membuat kata sandi baru (berlaku ${state.hours} jam, sekali pakai):\n${state.link}`)}`
     : '';
   return (
     <form action={action} className="card" style={{ gap: 10 }}>

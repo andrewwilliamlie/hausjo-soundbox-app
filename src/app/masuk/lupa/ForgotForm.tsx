@@ -13,7 +13,7 @@ export default function ForgotForm() {
         <span className="pop"><IconTile name="checkCircle" tone="green" size={72} /></span>
         <h1 style={{ margin: 0, fontSize: 22, fontWeight: 800 }}>Cek email Anda</h1>
         <p className="hint" style={{ fontSize: 14 }}>Jika nomor atau email itu terdaftar, link untuk membuat kata sandi baru sudah kami kirim ke email akun. Link berlaku 1 jam. Cek juga folder Spam.</p>
-        <p className="hint">Tidak bisa membuka email? Hubungi CS HausJo, admin bisa mengirim link lewat WhatsApp.</p>
+        <p className="hint">Tidak bisa membuka email? Hubungi CS AIPOS, admin bisa mengirim link lewat WhatsApp.</p>
         <Link href="/masuk?form=1" className="btn btn-ghost btn-block">Kembali ke Masuk</Link>
       </div>
     );

@@ -4,7 +4,7 @@ import AdminHeader from '../AdminHeader';
 import { AddMember, MemberRow } from './TeamForms';
 
 export const dynamic = 'force-dynamic';
-export const metadata = { title: 'Tim · Admin HausJo' };
+export const metadata = { title: 'Tim · Admin AIPOS' };
 
 const ROLE_HELP: Array<[Role, string]> = [
   ['REVIEWER', 'Memeriksa foto dan data, minta revisi, pilih bank, menyetujui pendaftaran.'],

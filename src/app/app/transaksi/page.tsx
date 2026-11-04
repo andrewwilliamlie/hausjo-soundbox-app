@@ -3,7 +3,7 @@ import Icon from '@/components/Icon';
 import { loadMerchantView } from '@/lib/merchant-view';
 import PageTop from '../PageTop';
 
-export const metadata = { title: 'Transaksi · HausJo' };
+export const metadata = { title: 'Transaksi · AIPOS' };
 export const dynamic = 'force-dynamic';
 
 const PERIODS: Array<[string, string]> = [['hari', 'Hari ini'], ['7', '7 hari'], ['30', '30 hari']];

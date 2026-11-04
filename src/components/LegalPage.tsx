@@ -1,3 +1,4 @@
+import Logo from '@/components/Logo';
 import Link from 'next/link';
 
 export type Section = { h: string; p?: string[]; list?: string[] };
@@ -9,13 +10,13 @@ export default function LegalPage({ title, updated, intro, sections, other }: {
   return (
     <div className="shell">
       <header className="topbar">
-        <Link href="/" className="brand" aria-label="HausJo beranda">HAUS<span>JO</span></Link>
+        <Link href="/" aria-label="AIPOS beranda"><Logo height={26} /></Link>
         <Link href="/daftar" style={{ fontSize: 14, fontWeight: 600, textDecoration: 'none', padding: '10px 4px' }}>Daftar</Link>
       </header>
       <main className="content legal" style={{ gap: 18 }}>
         <div style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
           <h1 style={{ margin: 0, fontSize: 24, fontWeight: 800 }}>{title}</h1>
-          <span className="hint">Berlaku sejak {updated} · PT Hausjo Digital Pro</span>
+          <span className="hint">Berlaku sejak {updated} · PT Global Platform Asiatic</span>
         </div>
         <p style={{ margin: 0 }}>{intro}</p>
         <nav aria-label="Daftar isi" className="card" style={{ gap: 6, padding: 14 }}>

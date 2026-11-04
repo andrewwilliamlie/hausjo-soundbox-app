@@ -36,15 +36,15 @@ const APP = () => process.env.APP_URL || 'https://beta.hausjo.co.id';
 
 export const mails = {
   submitted: (ticket: string) => ({
-    subject: `Pendaftaran HausJo diterima · ${ticket}`,
-    text: `Terima kasih, pendaftaran Anda (${ticket}) sudah kami terima.\n\nTim kami memeriksa data dalam 1–2 hari kerja. Sambil menunggu, tambahkan rekening pencairan di aplikasi agar QRIS bisa diterbitkan:\n${APP()}/app\n\nHausJo`
+    subject: `Pendaftaran AIPOS diterima · ${ticket}`,
+    text: `Terima kasih, pendaftaran Anda (${ticket}) sudah kami terima.\n\nTim kami memeriksa data dalam 1–2 hari kerja. Sambil menunggu, tambahkan rekening pencairan di aplikasi agar QRIS bisa diterbitkan:\n${APP()}/app\n\nAIPOS`
   }),
   revision: (ticket: string, items: string[]) => ({
     subject: `Perlu perbaikan foto · ${ticket}`,
-    text: `Ada foto yang perlu diganti:\n${items.map((i) => '- ' + i).join('\n')}\n\nFoto lain sudah disetujui. Unggah ulang di:\n${APP()}/app\n\nHausJo`
+    text: `Ada foto yang perlu diganti:\n${items.map((i) => '- ' + i).join('\n')}\n\nFoto lain sudah disetujui. Unggah ulang di:\n${APP()}/app\n\nAIPOS`
   }),
   active: (ticket: string, name: string) => ({
     subject: `QRIS Anda sudah aktif · ${name}`,
-    text: `Selamat, QRIS untuk ${name} (${ticket}) sudah aktif. Stiker QRIS terlampir dan bisa diunduh kapan saja di:\n${APP()}/app\n\nHausJo`
+    text: `Selamat, QRIS untuk ${name} (${ticket}) sudah aktif. Stiker QRIS terlampir dan bisa diunduh kapan saja di:\n${APP()}/app\n\nAIPOS`
   })
 };

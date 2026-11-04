@@ -57,12 +57,12 @@ export default function DaftarForm({ initialProduct }: { initialProduct: 'soundb
         <input className="input" name="password" type="password" autoComplete="new-password" minLength={8} placeholder="Minimal 8 karakter" required />
       </label>
       <label className="field">Kode referral <span style={{ fontWeight: 500, color: 'var(--muted)' }}>(opsional)</span>
-        <input className="input" name="referral" placeholder="Dari agen atau sales HausJo" />
+        <input className="input" name="referral" placeholder="Dari agen atau sales AIPOS" />
       </label>
 
       {state.error && <p className="err" role="alert">{state.error}</p>}
       <button type="submit" className="btn btn-primary btn-block" disabled={pending}>{pending ? 'Membuat akun…' : 'Daftar'}</button>
-      <p className="hint">Dengan mendaftar, Anda menyetujui <Link href="/syarat-ketentuan" target="_blank" style={{ fontWeight: 700 }}>Syarat &amp; Ketentuan</Link> dan <Link href="/kebijakan-privasi" target="_blank" style={{ fontWeight: 700 }}>Kebijakan Privasi</Link> HausJo.</p>
+      <p className="hint">Dengan mendaftar, Anda menyetujui <Link href="/syarat-ketentuan" target="_blank" style={{ fontWeight: 700 }}>Syarat &amp; Ketentuan</Link> dan <Link href="/kebijakan-privasi" target="_blank" style={{ fontWeight: 700 }}>Kebijakan Privasi</Link> AIPOS.</p>
       <p className="hint">Sudah punya akun? <Link href="/masuk?form=1" style={{ fontWeight: 700 }}>Masuk</Link></p>
     </form>
   );

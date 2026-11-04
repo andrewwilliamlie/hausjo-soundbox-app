@@ -1,19 +1,20 @@
+import Logo from '@/components/Logo';
 import Link from 'next/link';
 import Icon, { IconTile } from '@/components/Icon';
 import SoundboxArt from '@/components/SoundboxArt';
 
-// Public landing page for hausjo.co.id: two clear signup options.
+// Public landing page: two clear signup options.
 export default function Home() {
   return (
     <div className="shell">
       <header className="topbar">
-        <Link href="/" className="brand" aria-label="HausJo beranda">HAUS<span>JO</span></Link>
+        <Link href="/" aria-label="AIPOS beranda"><Logo height={26} tagline /></Link>
         <Link href="/masuk" style={{ fontSize: 14, fontWeight: 600, textDecoration: 'none', padding: '10px 4px' }}>Masuk</Link>
       </header>
 
       <main className="content" style={{ gap: 22 }}>
         <section className="hero rise" style={{ overflow: 'hidden' }}>
-          <p className="eyebrow">SOUNDBOX QRIS HAUSJO</p>
+          <p className="eyebrow">SOUNDBOX QRIS AIPOS</p>
           <h1>Setiap pembayaran QRIS, ada suaranya.</h1>
           <p>Daftar dalam 3 langkah, gratis. QRIS aktif dalam 1–2 hari kerja.</p>
           <SoundboxArt />
@@ -78,7 +79,7 @@ export default function Home() {
         <nav className="legal-links" aria-label="Informasi">
           <Link href="/syarat-ketentuan">Syarat &amp; Ketentuan</Link>
           <Link href="/kebijakan-privasi">Kebijakan Privasi</Link>
-          <span className="hint">© PT Hausjo Digital Pro</span>
+          <span className="hint">AIPOS by HausJo · © PT Global Platform Asiatic</span>
         </nav>
       </main>
     </div>

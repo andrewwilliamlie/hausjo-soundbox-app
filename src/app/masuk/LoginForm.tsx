@@ -1,9 +1,10 @@
 'use client';
 
+import Logo from '@/components/Logo';
 import Link from 'next/link';
 import { useActionState, useState } from 'react';
 import Icon, { type IconName } from '@/components/Icon';
-import { CS_WHATSAPP_DISPLAY, waLink } from '@/lib/contact';
+import { CS_EMAIL, CS_WHATSAPP_DISPLAY, waLink } from '@/lib/contact';
 import { login, type LoginState } from './actions';
 
 type PanelKind = '' | 'login' | 'fees' | 'how' | 'official';
@@ -35,13 +36,13 @@ export default function WelcomeLogin({ storeName, openForm }: { storeName: strin
   return (
     <div className="shell welcome">
       <header className="welcome-top">
-        <span className="app-logo big">HAUS<span>JO</span></span>
-        <span className="welcome-hi">Selamat datang{storeName ? ',' : ' di HausJo'}</span>
+        <Logo white height={46} tagline />
+        <span className="welcome-hi">Selamat datang{storeName ? ',' : ' di AIPOS'}</span>
         {storeName && <strong className="welcome-name">{storeName}</strong>}
       </header>
 
       <main className="welcome-sheet">
-        <h2 className="h2" style={{ fontSize: 17 }}>Ada yang baru di <em className="brand-em">Hausjo</em></h2>
+        <h2 className="h2" style={{ fontSize: 17 }}>Ada yang baru di <em className="brand-em">AIPOS</em></h2>
         <div className="promo-row" role="list">
           <Link role="listitem" href="/daftar?produk=soundbox" className="promo light">
             <strong>Soundbox Rp349rb<br />sekali bayar, tanpa sewa</strong>
@@ -67,7 +68,7 @@ export default function WelcomeLogin({ storeName, openForm }: { storeName: strin
         </div>
 
         <div className="chip-row">
-          <a className="info-chip" href={waLink('Halo HausJo, saya mau bertanya.')} target="_blank" rel="noreferrer"><Icon name="whatsapp" size={18} color="var(--ok)" />WhatsApp {CS_WHATSAPP_DISPLAY}</a>
+          <a className="info-chip" href={waLink('Halo AIPOS, saya mau bertanya.')} target="_blank" rel="noreferrer"><Icon name="whatsapp" size={18} color="var(--ok)" />WhatsApp {CS_WHATSAPP_DISPLAY}</a>
           <button type="button" className="info-chip" onClick={() => setPanel('official')}><Icon name="shield" size={18} color="var(--blue)" />Cek nomor resmi</button>
         </div>
 
@@ -131,12 +132,11 @@ export default function WelcomeLogin({ storeName, openForm }: { storeName: strin
 
       {panel === 'official' && (
         <Panel label="Kontak resmi" onClose={() => setPanel('')}>
-          <h2 className="h2" style={{ fontSize: 19 }}>Kontak resmi HausJo</h2>
-          <p className="hint">Hati-hati penipuan. HausJo tidak pernah meminta kata sandi, PIN atau kode OTP Anda.</p>
+          <h2 className="h2" style={{ fontSize: 19 }}>Kontak resmi AIPOS</h2>
+          <p className="hint">Hati-hati penipuan. AIPOS tidak pernah meminta kata sandi, PIN atau kode OTP Anda.</p>
           <div>
             <div className="fee"><span>WhatsApp CS</span><strong>{CS_WHATSAPP_DISPLAY}</strong></div>
-            <div className="fee"><span>Situs</span><strong>hausjo.co.id · hausjo.id</strong></div>
-            <div className="fee"><span>Email</span><strong>hausjoapp@gmail.com</strong></div>
+            <div className="fee"><span>Email</span><strong>{CS_EMAIL}</strong></div>
           </div>
           <button type="button" className="btn btn-ghost" onClick={() => setPanel('')}>Tutup</button>
         </Panel>

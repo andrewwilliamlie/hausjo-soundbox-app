@@ -75,7 +75,7 @@ export async function submitSerial(serial: string): Promise<Result> {
     data: { product: 'SOUNDBOX', soundboxStatus: 'ARRIVED', serialNumber: sn, needsGuide: true, guidedAt: null }
   });
   revalidatePath('/app');
-  return { ok: true, message: 'SN tercatat. CS HausJo akan menghubungi Anda untuk panduan aktivasi.' };
+  return { ok: true, message: 'SN tercatat. CS AIPOS akan menghubungi Anda untuk panduan aktivasi.' };
 }
 
 export async function changeMerchantPassword(input: { current: string; next: string; again: string }): Promise<Result> {

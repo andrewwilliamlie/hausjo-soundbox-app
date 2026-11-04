@@ -25,7 +25,7 @@ export default function PayoutClient({ app }: { app: AppView }) {
         )}
         <span className="mc-sub"><Icon name="clock" size={16} />Cair {h1 ? 'H+1 (hari kerja berikutnya)' : 'hari yang sama'}</span>
         {locked
-          ? <a className="mc-foot" href={waLink(`Halo HausJo, saya mau mengubah rekening pencairan untuk ${app.businessName} (${app.ticket}).`)} target="_blank" rel="noreferrer">Ubah rekening lewat CS <Icon name="arrowRight" size={18} /></a>
+          ? <a className="mc-foot" href={waLink(`Halo AIPOS, saya mau mengubah rekening pencairan untuk ${app.businessName} (${app.ticket}).`)} target="_blank" rel="noreferrer">Ubah rekening lewat CS <Icon name="arrowRight" size={18} /></a>
           : <button type="button" className="mc-foot" onClick={() => setOpen(true)}>{app.bankSet ? 'Ubah rekening' : 'Tambah rekening sekarang'} <Icon name="arrowRight" size={18} /></button>}
       </section>
 

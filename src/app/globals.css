@@ -1,7 +1,7 @@
 :root {
   --navy: #0b2253;
-  --blue: #1f5fd6;
-  --blue-soft: #eaf2ff;
+  --blue: #0069fc;
+  --blue-soft: #e8f1ff;
   --ink: #0b1b3a;
   --muted: #4a5878;
   --line: #e3e9f2;
@@ -28,7 +28,7 @@ button, input, select, textarea { font: inherit; }
 .brand span { color: var(--blue); }
 .content { flex: 1; padding: 20px; display: flex; flex-direction: column; gap: 16px; }
 
-.hero { background: var(--navy); color: #fff; border-radius: 18px; padding: 24px 20px; display: flex; flex-direction: column; gap: 10px; }
+.hero { background: linear-gradient(160deg, #0058d6 0%, #2f86ff 100%); color: #fff; border-radius: 18px; padding: 24px 20px; display: flex; flex-direction: column; gap: 10px; }
 .hero .eyebrow { margin: 0; font-size: 12px; font-weight: 700; letter-spacing: 1px; color: #bfd4ff; }
 .hero h1 { margin: 0; font-size: 26px; line-height: 1.2; font-weight: 800; }
 .hero p { margin: 0; font-size: 14px; line-height: 1.5; color: #dce6fa; }
@@ -46,7 +46,7 @@ button, input, select, textarea { font: inherit; }
 
 .btn { display: inline-flex; align-items: center; justify-content: center; min-height: 48px; padding: 0 18px; border-radius: 12px; border: 0; font-size: 15px; font-weight: 700; cursor: pointer; text-decoration: none; }
 .btn-primary { background: var(--blue); color: #fff; }
-.btn-primary:hover { background: #184fb5; color: #fff; }
+.btn-primary:hover { background: #0052c7; color: #fff; }
 .btn-primary:disabled { background: #9aa8c1; cursor: not-allowed; }
 .btn-ghost { background: #fff; color: var(--navy); border: 1px solid var(--line-2); }
 .btn-block { width: 100%; }
@@ -88,7 +88,7 @@ button, input, select, textarea { font: inherit; }
 .chip, .choice { transition: background .2s ease, border-color .2s ease, color .2s ease, transform .12s ease; }
 .card.plan, .tap { transition: border-color .2s ease, box-shadow .2s ease, transform .12s ease; }
 .card.plan:hover { box-shadow: 0 6px 20px rgba(11,34,83,.08); }
-.btn-primary:not(:disabled) { box-shadow: 0 4px 12px rgba(31,95,214,.25); }
+.btn-primary:not(:disabled) { box-shadow: 0 4px 12px rgba(0,105,252,.25); }
 
 .fade-in { animation: fadeIn .35s ease-out both; }
 .rise { animation: rise .45s cubic-bezier(.2,.8,.2,1) both; }
@@ -160,7 +160,7 @@ button, input, select, textarea { font: inherit; }
 @media (prefers-reduced-motion: reduce) { .live-steps i { transition: none; } }
 
 /* ---------- Merchant app (HausJo app style) ---------- */
-:root { --app-blue: #1d5fe0; --app-blue-2: #2f7bea; --app-navy: #0f2d6e; --tile: #e9f1ff; }
+:root { --app-blue: #0069fc; --app-blue-2: #3a8bff; --app-navy: #0a2a6e; --tile: #e9f1ff; }
 .app-shell { background: #fff; padding-bottom: 84px; }
 .app-logo { font-size: 20px; font-weight: 800; letter-spacing: .5px; color: #fff; }
 .app-logo span { color: #8cc0ff; }
@@ -259,5 +259,5 @@ button, input, select, textarea { font: inherit; }
 .chip-row::-webkit-scrollbar { display: none; }
 .info-chip { display: inline-flex; gap: 8px; align-items: center; white-space: nowrap; background: #f2f6fc; border: 0; border-radius: 999px; padding: 10px 16px; font-size: 13px; font-weight: 700; color: var(--ink); text-decoration: none; cursor: pointer; font-family: inherit; min-height: 44px; }
 .welcome-actions { margin-top: auto; display: flex; flex-direction: column; gap: 12px; padding-top: 18px; }
-.btn.pill { border-radius: 999px; min-height: 54px; font-size: 16px; background: #1d4fbf; }
+.btn.pill { border-radius: 999px; min-height: 54px; font-size: 16px; background: #0058d6; }
 @media (prefers-reduced-motion: reduce) { .feat, .q-tile { transition: none; } }

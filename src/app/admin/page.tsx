@@ -10,7 +10,7 @@ import {
 } from './actions';
 
 export const dynamic = 'force-dynamic';
-export const metadata = { title: 'Admin HausJo' };
+export const metadata = { title: 'Admin AIPOS' };
 
 const STATUS: Record<string, [string, string, string]> = {
   SUBMITTED: ['Baru', '#eaf2ff', '#1f4fb0'],

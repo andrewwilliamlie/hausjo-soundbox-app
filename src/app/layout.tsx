@@ -5,12 +5,12 @@ import './globals.css';
 const font = Plus_Jakarta_Sans({ subsets: ['latin'], weight: ['400', '500', '600', '700', '800'], display: 'swap' });
 
 export const metadata: Metadata = {
-  title: 'Soundbox QRIS HausJo – Setiap pembayaran QRIS, ada suaranya',
+  title: 'Soundbox QRIS AIPOS – Setiap pembayaran QRIS, ada suaranya',
   description:
-    'Daftar Soundbox QRIS atau QRIS gratis dari HausJo. QRIS aktif dalam 1–2 hari kerja. MDR 0% untuk transaksi di bawah Rp500.000 (pencairan H+1).'
+    'Daftar Soundbox QRIS atau QRIS gratis dari AIPOS. QRIS aktif dalam 1–2 hari kerja. MDR 0% untuk transaksi di bawah Rp500.000 (pencairan H+1).'
 };
 
-export const viewport: Viewport = { width: 'device-width', initialScale: 1, themeColor: '#0B2253' };
+export const viewport: Viewport = { width: 'device-width', initialScale: 1, themeColor: '#0069FC' };
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (

@@ -24,7 +24,7 @@ export async function adminLogin(_prev: { error: string | null }, form: FormData
   const password = String(form.get('password') || '');
   const admin = await db.admin.findUnique({ where: { email } });
   if (!admin || !(await bcrypt.compare(password, admin.passwordHash))) return { error: 'Email atau kata sandi salah' };
-  if (!admin.active) return { error: 'Akun ini dinonaktifkan. Hubungi admin HausJo.' };
+  if (!admin.active) return { error: 'Akun ini dinonaktifkan. Hubungi admin AIPOS.' };
   await db.admin.update({ where: { id: admin.id }, data: { lastLoginAt: new Date() } });
   await startAdminSession(admin.id);
   await audit(admin.id, 'LOGIN');

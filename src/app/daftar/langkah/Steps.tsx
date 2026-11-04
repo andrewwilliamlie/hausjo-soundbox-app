@@ -245,7 +245,7 @@ export default function Steps({ initial, uploaded, product }: { initial: Data; u
           </div>
           <label style={{ display: 'flex', gap: 10, alignItems: 'flex-start', fontSize: 13, lineHeight: 1.5 }}>
             <input type="checkbox" checked={agree} onChange={(e) => setAgree(e.target.checked)} style={{ width: 20, height: 20, margin: 0, flexShrink: 0 }} />
-            <span>Data saya benar. Saya setuju data dipakai HausJo dan bank mitra untuk pendaftaran merchant, sesuai <a href="/syarat-ketentuan" target="_blank" style={{ fontWeight: 700 }}>Syarat &amp; Ketentuan</a> dan <a href="/kebijakan-privasi" target="_blank" style={{ fontWeight: 700 }}>Kebijakan Privasi</a>.</span>
+            <span>Data saya benar. Saya setuju data dipakai AIPOS dan bank mitra untuk pendaftaran merchant, sesuai <a href="/syarat-ketentuan" target="_blank" style={{ fontWeight: 700 }}>Syarat &amp; Ketentuan</a> dan <a href="/kebijakan-privasi" target="_blank" style={{ fontWeight: 700 }}>Kebijakan Privasi</a>.</span>
           </label>
         </div>
       )}

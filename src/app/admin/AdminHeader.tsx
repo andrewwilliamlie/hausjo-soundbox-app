@@ -1,3 +1,4 @@
+import Logo from '@/components/Logo';
 import Link from 'next/link';
 import type { Admin } from '@prisma/client';
 import { adminLogout } from './actions';
@@ -14,7 +15,7 @@ export default function AdminHeader({ admin, tab }: { admin: Admin; tab: string 
   return (
     <header className="admin-top">
       <div style={{ display: 'flex', flexWrap: 'wrap', alignItems: 'center', gap: 18 }}>
-        <strong style={{ fontSize: 18 }}>HAUS<span style={{ color: '#8db4ff' }}>JO</span> <span style={{ fontWeight: 500, fontSize: 13, color: '#bfd4ff' }}>Admin</span></strong>
+        <strong style={{ display: 'inline-flex', alignItems: 'center', gap: 10 }}><Logo white height={20} /><span style={{ fontWeight: 500, fontSize: 13, color: '#bfd4ff' }}>Admin</span></strong>
         {!admin.mustChangePassword && (
           <nav aria-label="Menu admin" style={{ display: 'flex', gap: 4, flexWrap: 'wrap' }}>
             {TABS.filter(([, , , adminOnly]) => !adminOnly || admin.role === 'ADMIN').map(([k, label, href]) => (

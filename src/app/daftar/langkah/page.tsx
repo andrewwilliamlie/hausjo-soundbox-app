@@ -1,9 +1,10 @@
+import Logo from '@/components/Logo';
 import Link from 'next/link';
 import { redirect } from 'next/navigation';
 import { requireMerchant } from '@/lib/auth';
 import Steps from './Steps';
 
-export const metadata = { title: 'Langkah pendaftaran · HausJo' };
+export const metadata = { title: 'Langkah pendaftaran · AIPOS' };
 export const dynamic = 'force-dynamic';
 
 export default async function LangkahPage() {
@@ -15,7 +16,7 @@ export default async function LangkahPage() {
   return (
     <div className="shell">
       <header className="topbar">
-        <Link href="/" className="brand">HAUS<span>JO</span></Link>
+        <Link href="/" aria-label="AIPOS beranda"><Logo height={26} /></Link>
       </header>
       <Steps
         initial={{

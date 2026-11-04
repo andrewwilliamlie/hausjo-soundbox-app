@@ -6,7 +6,7 @@ import { logout } from '../../masuk/actions';
 import PageTop from '../PageTop';
 import PasswordForm from './PasswordForm';
 
-export const metadata = { title: 'Akun · HausJo' };
+export const metadata = { title: 'Akun · AIPOS' };
 export const dynamic = 'force-dynamic';
 
 export default async function AccountPage() {
@@ -40,7 +40,7 @@ export default async function AccountPage() {
         <PasswordForm />
 
         <nav className="card rise rise-2 menu-list" aria-label="Lainnya">
-          <a href={waLink(`Halo HausJo, saya butuh bantuan. Tiket ${app.ticket}.`)} target="_blank" rel="noreferrer"><Icon name="whatsapp" size={20} />Bantuan CS · {CS_WHATSAPP_DISPLAY}<Icon name="chevron" size={18} /></a>
+          <a href={waLink(`Halo AIPOS, saya butuh bantuan. Tiket ${app.ticket}.`)} target="_blank" rel="noreferrer"><Icon name="whatsapp" size={20} />Bantuan CS · {CS_WHATSAPP_DISPLAY}<Icon name="chevron" size={18} /></a>
           <a href="https://hausjo.id/produk" target="_blank" rel="noreferrer"><Icon name="edc" size={20} />Beli EDC<Icon name="chevron" size={18} /></a>
           <Link href="/syarat-ketentuan"><Icon name="file" size={20} />Syarat &amp; Ketentuan<Icon name="chevron" size={18} /></Link>
           <Link href="/kebijakan-privasi"><Icon name="shield" size={20} />Kebijakan Privasi<Icon name="chevron" size={18} /></Link>

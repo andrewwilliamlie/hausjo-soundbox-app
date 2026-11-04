@@ -15,8 +15,8 @@ const APP = () => process.env.APP_URL || 'https://beta.hausjo.co.id';
 
 function welcomeMail(name: string, email: string, temp: string, reset: boolean) {
   return {
-    subject: reset ? 'Kata sandi admin HausJo diatur ulang' : 'Akun admin HausJo Anda',
-    text: `Halo ${name},\n\n${reset ? 'Kata sandi akun admin Anda sudah diatur ulang.' : 'Akun admin HausJo sudah dibuat untuk Anda.'}\n\nMasuk di: ${APP()}/admin/masuk\nEmail: ${email}\nKata sandi sementara: ${temp}\n\nAnda akan diminta membuat kata sandi baru saat pertama masuk.\n\nHausJo`
+    subject: reset ? 'Kata sandi admin AIPOS diatur ulang' : 'Akun admin AIPOS Anda',
+    text: `Halo ${name},\n\n${reset ? 'Kata sandi akun admin Anda sudah diatur ulang.' : 'Akun admin AIPOS sudah dibuat untuk Anda.'}\n\nMasuk di: ${APP()}/admin/masuk\nEmail: ${email}\nKata sandi sementara: ${temp}\n\nAnda akan diminta membuat kata sandi baru saat pertama masuk.\n\nAIPOS`
   };
 }
 

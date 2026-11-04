@@ -1,5 +1,6 @@
 'use client';
 
+import Logo from '@/components/Logo';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { useState } from 'react';
@@ -43,7 +44,7 @@ export default function HomeClient({ app, isNew }: { app: AppView; isNew: boolea
   if (!app.bankSet && !active) { statusTitle = 'Tambahkan rekening'; statusSub = 'Data Anda sedang diperiksa. QRIS diterbitkan setelah rekening ada.'; }
   if (app.status === 'REVISION') { statusTitle = 'Perlu revisi foto'; statusSub = 'Ganti foto yang ditandai di bawah. Foto lain sudah disetujui.'; }
   if (app.status === 'BANK') { statusTitle = 'Diproses bank'; statusSub = 'Data sudah dikirim ke bank. QRIS terbit dalam 1–2 hari kerja.'; }
-  if (app.status === 'REJECTED') { statusTitle = 'Pendaftaran ditolak'; statusSub = 'Hubungi CS HausJo untuk informasi lebih lanjut.'; }
+  if (app.status === 'REJECTED') { statusTitle = 'Pendaftaran ditolak'; statusSub = 'Hubungi CS AIPOS untuk informasi lebih lanjut.'; }
 
   const soon = () => setToast(SOON);
   const quick: Feature[] = [
@@ -56,10 +57,10 @@ export default function HomeClient({ app, isNew }: { app: AppView; isNew: boolea
     { icon: 'speaker', label: 'Soundbox', action: () => { setSbWay(active && app.product === 'SOUNDBOX' ? 'arrived' : 'buy'); setSheet('sb'); } },
     { icon: 'store', label: 'Toko saya', href: '/app/akun#toko' },
     { icon: 'users', label: 'Anggota', action: soon, soon: true },
-    { icon: 'printer', label: 'Pesan stiker', href: waLink(`Halo HausJo, saya mau pesan stiker QRIS cetak untuk ${app.businessName} (${app.ticket}).`), external: true },
+    { icon: 'printer', label: 'Pesan stiker', href: waLink(`Halo AIPOS, saya mau pesan stiker QRIS cetak untuk ${app.businessName} (${app.ticket}).`), external: true },
     { icon: 'edc', label: 'Beli EDC', href: 'https://hausjo.id/produk', external: true },
     { icon: 'gift', label: 'Referral', action: soon, soon: true },
-    { icon: 'help', label: 'Bantuan', href: waLink(`Halo HausJo, saya butuh bantuan. Tiket ${app.ticket}.`), external: true },
+    { icon: 'help', label: 'Bantuan', href: waLink(`Halo AIPOS, saya butuh bantuan. Tiket ${app.ticket}.`), external: true },
     { icon: 'grid', label: 'Lainnya', href: '/app/akun' }
   ];
   const q = query.trim().toLowerCase();
@@ -82,7 +83,7 @@ export default function HomeClient({ app, isNew }: { app: AppView; isNew: boolea
     <>
       <div className="app-top">
         <header className="app-head">
-          <span className="app-logo">HAUS<span>JO</span></span>
+          <Logo white height={22} />
           <span className="app-hello">
             <span>Selamat datang,</span>
             <strong>{app.businessName}{app.area ? ` · ${app.area}` : ''}</strong>
@@ -185,7 +186,7 @@ export default function HomeClient({ app, isNew }: { app: AppView; isNew: boolea
             <Icon name="chevron" size={18} color="var(--muted)" />
           </button>
         )}
-        {app.needsGuide && <div className="note fade-in" style={{ display: 'flex', gap: 8, alignItems: 'center' }}><Icon name="whatsapp" size={20} />SN {app.serialNumber} tercatat. CS HausJo akan menghubungi Anda lewat WhatsApp.</div>}
+        {app.needsGuide && <div className="note fade-in" style={{ display: 'flex', gap: 8, alignItems: 'center' }}><Icon name="whatsapp" size={20} />SN {app.serialNumber} tercatat. CS AIPOS akan menghubungi Anda lewat WhatsApp.</div>}
       </main>
 
       {toast}

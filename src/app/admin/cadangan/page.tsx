@@ -4,7 +4,7 @@ import AdminHeader from '../AdminHeader';
 import BackupNow from './BackupNow';
 
 export const dynamic = 'force-dynamic';
-export const metadata = { title: 'Cadangan · Admin HausJo' };
+export const metadata = { title: 'Cadangan · Admin AIPOS' };
 
 const size = (b: number) => (b > 1024 * 1024 ? (b / 1024 / 1024).toFixed(1) + ' MB' : Math.max(1, Math.round(b / 1024)) + ' KB');
 

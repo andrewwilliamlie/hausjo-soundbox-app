@@ -1,14 +1,14 @@
 import LegalPage, { type Section } from '@/components/LegalPage';
 
-export const metadata = { title: 'Kebijakan Privasi · HausJo' };
+export const metadata = { title: 'Kebijakan Privasi · AIPOS' };
 
-const CONTACT = 'hausjoapp@gmail.com';
+const CONTACT = 'support@aipos.co.id';
 
 const sections: Section[] = [
   {
     h: 'Siapa kami',
     p: [
-      'Layanan pendaftaran merchant QRIS dan Soundbox QRIS di hausjo.co.id dikelola oleh PT Hausjo Digital Pro ("HausJo", "kami"). Untuk data yang Anda berikan saat mendaftar, HausJo bertindak sebagai pengendali data pribadi sebagaimana dimaksud dalam Undang-Undang Nomor 27 Tahun 2022 tentang Pelindungan Data Pribadi (UU PDP).'
+      'Layanan pendaftaran merchant QRIS dan Soundbox QRIS di aplikasi AIPOS dikelola oleh PT Global Platform Asiatic ("AIPOS", "kami"). Untuk data yang Anda berikan saat mendaftar, AIPOS bertindak sebagai pengendali data pribadi sebagaimana dimaksud dalam Undang-Undang Nomor 27 Tahun 2022 tentang Pelindungan Data Pribadi (UU PDP).'
     ]
   },
   {
@@ -46,7 +46,7 @@ const sections: Section[] = [
   {
     h: 'Penyimpanan dan keamanan',
     list: [
-      'Data disimpan di server yang hanya bisa diakses tim HausJo yang berwenang. Foto e-KTP, selfie, dan dokumen lain tidak bisa dibuka lewat link publik.',
+      'Data disimpan di server yang hanya bisa diakses tim AIPOS yang berwenang. Foto e-KTP, selfie, dan dokumen lain tidak bisa dibuka lewat link publik.',
       'Setiap petugas punya akun sendiri dengan hak akses sesuai perannya, dan setiap pembukaan foto identitas tercatat.',
       'Koneksi ke situs dienkripsi (HTTPS). Data dicadangkan secara berkala untuk mencegah kehilangan.',
       'Bila terjadi kegagalan pelindungan data pribadi, kami akan memberi tahu Anda dan lembaga yang berwenang sesuai ketentuan UU PDP.'
@@ -55,7 +55,7 @@ const sections: Section[] = [
   {
     h: 'Berapa lama data disimpan',
     p: [
-      'Data disimpan selama Anda menjadi merchant HausJo, dan setelah itu selama jangka waktu yang diwajibkan peraturan di bidang sistem pembayaran dan pencegahan pencucian uang. Setelah masa itu berakhir, data dihapus atau dianonimkan. Data pendaftaran yang tidak pernah dikirim (masih draf) dapat kami hapus setelah 6 bulan tidak aktif.'
+      'Data disimpan selama Anda menjadi merchant AIPOS, dan setelah itu selama jangka waktu yang diwajibkan peraturan di bidang sistem pembayaran dan pencegahan pencucian uang. Setelah masa itu berakhir, data dihapus atau dianonimkan. Data pendaftaran yang tidak pernah dikirim (masih draf) dapat kami hapus setelah 6 bulan tidak aktif.'
     ]
   },
   {
@@ -86,7 +86,7 @@ export default function PrivacyPage() {
     <LegalPage
       title="Kebijakan Privasi"
       updated="3 November 2026"
-      intro="Kebijakan ini menjelaskan data pribadi apa yang kami kumpulkan saat Anda mendaftar dan memakai layanan merchant HausJo, untuk apa data itu dipakai, kepada siapa dibagikan, dan hak Anda atas data tersebut."
+      intro="Kebijakan ini menjelaskan data pribadi apa yang kami kumpulkan saat Anda mendaftar dan memakai layanan merchant AIPOS, untuk apa data itu dipakai, kepada siapa dibagikan, dan hak Anda atas data tersebut."
       sections={sections}
       other={{ href: '/syarat-ketentuan', label: 'Syarat & Ketentuan Merchant' }}
     />

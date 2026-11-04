@@ -3,7 +3,7 @@ import AdminHeader from '../AdminHeader';
 import ChangePassword from './ChangePassword';
 
 export const dynamic = 'force-dynamic';
-export const metadata = { title: 'Akun saya · Admin HausJo' };
+export const metadata = { title: 'Akun saya · Admin AIPOS' };
 
 export default async function AccountPage() {
   const admin = await requireAdmin(undefined, { allowMustChange: true });

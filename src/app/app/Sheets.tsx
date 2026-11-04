@@ -147,10 +147,10 @@ export function SoundboxSheet({ initialWay = 'buy', onClose, onSaved }: { initia
           <label className="field">No. Pesanan<input className="input" value={f.orderNo} onChange={(e) => setF({ ...f, orderNo: e.target.value })} /></label>
         </>
       )}
-      {way === 'sales' && <label className="field">Nama sales HausJo<input className="input" value={f.salesName} onChange={(e) => setF({ ...f, salesName: e.target.value })} /></label>}
+      {way === 'sales' && <label className="field">Nama sales AIPOS<input className="input" value={f.salesName} onChange={(e) => setF({ ...f, salesName: e.target.value })} /></label>}
       {way === 'arrived' && (
         <>
-          <p className="hint">Pindai barcode SN di bagian bawah Soundbox. CS HausJo akan menghubungi Anda untuk memandu aktivasi dan cara pakai.</p>
+          <p className="hint">Pindai barcode SN di bagian bawah Soundbox. CS AIPOS akan menghubungi Anda untuk memandu aktivasi dan cara pakai.</p>
           <SerialScanner onResult={(v) => setF((x) => ({ ...x, serial: v }))} />
           <label className="field">Serial Number (SN)<input className="input" value={f.serial} onChange={(e) => setF({ ...f, serial: e.target.value.toUpperCase() })} placeholder="Ketik SN jika tidak bisa dipindai" /></label>
         </>

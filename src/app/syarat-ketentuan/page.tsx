@@ -1,12 +1,12 @@
 import LegalPage, { type Section } from '@/components/LegalPage';
 
-export const metadata = { title: 'Syarat & Ketentuan Merchant · HausJo' };
+export const metadata = { title: 'Syarat & Ketentuan Merchant · AIPOS' };
 
 const sections: Section[] = [
   {
     h: 'Para pihak dan persetujuan',
     p: [
-      'Syarat & Ketentuan ini berlaku antara PT Hausjo Digital Pro ("HausJo") dan Anda sebagai pemilik usaha yang mendaftar layanan QRIS dan/atau Soundbox QRIS HausJo ("Merchant"). Dengan membuat akun dan mengirim pendaftaran, Anda menyatakan telah membaca dan menyetujui Syarat & Ketentuan ini serta Kebijakan Privasi HausJo.'
+      'Syarat & Ketentuan ini berlaku antara PT Global Platform Asiatic ("AIPOS") dan Anda sebagai pemilik usaha yang mendaftar layanan QRIS dan/atau Soundbox QRIS AIPOS ("Merchant"). Dengan membuat akun dan mengirim pendaftaran, Anda menyatakan telah membaca dan menyetujui Syarat & Ketentuan ini serta Kebijakan Privasi AIPOS.'
     ]
   },
   {
@@ -14,7 +14,7 @@ const sections: Section[] = [
     list: [
       'QRIS saja: pendaftaran QRIS tanpa biaya pendaftaran. Merchant menerima stiker QRIS untuk dicetak sendiri.',
       'Soundbox QRIS: QRIS ditambah perangkat Soundbox yang menyuarakan setiap pembayaran masuk, dengan harga Rp349.000 sekali bayar. Soundbox menjadi milik Merchant, tanpa biaya sewa.',
-      'QRIS diterbitkan oleh bank atau penyelenggara jasa pembayaran mitra HausJo. HausJo memilih mitra penerbit berdasarkan data pendaftaran.'
+      'QRIS diterbitkan oleh bank atau penyelenggara jasa pembayaran mitra AIPOS. AIPOS memilih mitra penerbit berdasarkan data pendaftaran.'
     ]
   },
   {
@@ -28,7 +28,7 @@ const sections: Section[] = [
   {
     h: 'Kebenaran data',
     p: [
-      'Merchant wajib memberikan data dan foto yang benar, lengkap, dan milik sendiri, serta memperbaruinya bila berubah. HausJo dan bank mitra berhak memeriksa, meminta perbaikan, menunda, atau menolak pendaftaran. QRIS biasanya aktif dalam 1–2 hari kerja setelah data lengkap dan rekening ditambahkan, namun waktu ini bergantung pada proses bank mitra dan bukan jaminan.'
+      'Merchant wajib memberikan data dan foto yang benar, lengkap, dan milik sendiri, serta memperbaruinya bila berubah. AIPOS dan bank mitra berhak memeriksa, meminta perbaikan, menunda, atau menolak pendaftaran. QRIS biasanya aktif dalam 1–2 hari kerja setelah data lengkap dan rekening ditambahkan, namun waktu ini bergantung pada proses bank mitra dan bukan jaminan.'
     ]
   },
   {
@@ -50,7 +50,7 @@ const sections: Section[] = [
     h: 'Pembelian dan garansi Soundbox',
     list: [
       'Soundbox yang dibeli lewat aplikasi dibayar melalui link pembayaran yang dikirim setelah pendaftaran disetujui, dan dikirim setelah QRIS aktif.',
-      'Soundbox yang dibeli lewat marketplace resmi HausJo atau sales HausJo dicocokkan dengan nomor pesanan atau nama sales yang Merchant isi.',
+      'Soundbox yang dibeli lewat marketplace resmi AIPOS atau sales AIPOS dicocokkan dengan nomor pesanan atau nama sales yang Merchant isi.',
       'Setelah Soundbox diterima, Merchant dapat memindai nomor seri (SN) di aplikasi agar tim CS memandu aktivasi.',
       'Garansi, penukaran, dan pengembalian mengikuti ketentuan yang tertera pada kemasan atau halaman produk tempat pembelian.'
     ]
@@ -60,31 +60,31 @@ const sections: Section[] = [
     list: [
       'Memakai QRIS hanya untuk transaksi penjualan barang atau jasa yang sebenarnya dari usaha yang didaftarkan.',
       'Tidak membebankan biaya tambahan kepada pembeli yang membayar dengan QRIS (surcharge).',
-      'Menjaga kerahasiaan kata sandi akun dan segera memberi tahu HausJo bila akun diduga disalahgunakan.',
-      'Memasang stiker QRIS asli dari HausJo dan tidak menggantinya dengan kode lain.'
+      'Menjaga kerahasiaan kata sandi akun dan segera memberi tahu AIPOS bila akun diduga disalahgunakan.',
+      'Memasang stiker QRIS asli dari AIPOS dan tidak menggantinya dengan kode lain.'
     ]
   },
   {
     h: 'Penangguhan dan pengakhiran',
     p: [
-      'HausJo atau bank mitra dapat menangguhkan atau menghentikan QRIS bila Merchant melanggar Syarat & Ketentuan ini, memberikan data palsu, ada dugaan penipuan atau pencucian uang, atau atas perintah otoritas. Merchant dapat berhenti kapan saja dengan menghubungi HausJo; dana yang sudah menjadi hak Merchant tetap dicairkan setelah dikurangi biaya yang berlaku.'
+      'AIPOS atau bank mitra dapat menangguhkan atau menghentikan QRIS bila Merchant melanggar Syarat & Ketentuan ini, memberikan data palsu, ada dugaan penipuan atau pencucian uang, atau atas perintah otoritas. Merchant dapat berhenti kapan saja dengan menghubungi AIPOS; dana yang sudah menjadi hak Merchant tetap dicairkan setelah dikurangi biaya yang berlaku.'
     ]
   },
   {
     h: 'Batas tanggung jawab',
     p: [
-      'HausJo berupaya menjaga layanan tetap berjalan, namun tidak bertanggung jawab atas kerugian tidak langsung, atau gangguan yang disebabkan oleh bank mitra, jaringan, listrik, perangkat Merchant, atau keadaan di luar kendali wajar HausJo. Hal ini tidak mengurangi hak Merchant yang dilindungi peraturan perundang-undangan di bidang perlindungan konsumen.'
+      'AIPOS berupaya menjaga layanan tetap berjalan, namun tidak bertanggung jawab atas kerugian tidak langsung, atau gangguan yang disebabkan oleh bank mitra, jaringan, listrik, perangkat Merchant, atau keadaan di luar kendali wajar AIPOS. Hal ini tidak mengurangi hak Merchant yang dilindungi peraturan perundang-undangan di bidang perlindungan konsumen.'
     ]
   },
   {
     h: 'Hukum yang berlaku dan pengaduan',
     p: [
-      'Syarat & Ketentuan ini tunduk pada hukum Republik Indonesia. Pertanyaan dan pengaduan dapat dikirim ke hausjoapp@gmail.com. Perselisihan diselesaikan lebih dulu secara musyawarah; bila tidak tercapai, melalui lembaga penyelesaian sengketa atau pengadilan yang berwenang di Indonesia.'
+      'Syarat & Ketentuan ini tunduk pada hukum Republik Indonesia. Pertanyaan dan pengaduan dapat dikirim ke support@aipos.co.id. Perselisihan diselesaikan lebih dulu secara musyawarah; bila tidak tercapai, melalui lembaga penyelesaian sengketa atau pengadilan yang berwenang di Indonesia.'
     ]
   },
   {
     h: 'Perubahan',
-    p: ['HausJo dapat mengubah Syarat & Ketentuan ini. Perubahan penting diberitahukan lewat email atau aplikasi sebelum berlaku. Bila Merchant tetap memakai layanan setelah tanggal berlaku, Merchant dianggap menyetujui perubahan tersebut.']
+    p: ['AIPOS dapat mengubah Syarat & Ketentuan ini. Perubahan penting diberitahukan lewat email atau aplikasi sebelum berlaku. Bila Merchant tetap memakai layanan setelah tanggal berlaku, Merchant dianggap menyetujui perubahan tersebut.']
   }
 ];
 
@@ -93,7 +93,7 @@ export default function TermsPage() {
     <LegalPage
       title="Syarat & Ketentuan Merchant"
       updated="3 November 2026"
-      intro="Ketentuan ini mengatur pendaftaran dan pemakaian layanan QRIS dan Soundbox QRIS HausJo, termasuk biaya, pencairan dana, serta hak dan kewajiban Anda sebagai Merchant."
+      intro="Ketentuan ini mengatur pendaftaran dan pemakaian layanan QRIS dan Soundbox QRIS AIPOS, termasuk biaya, pencairan dana, serta hak dan kewajiban Anda sebagai Merchant."
       sections={sections}
       other={{ href: '/kebijakan-privasi', label: 'Kebijakan Privasi' }}
     />
