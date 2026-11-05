@@ -75,6 +75,9 @@ model User {
   lockedUntil  DateTime? // login blocked until this time after too many wrong PINs
   applications Application[]
   passwordResets PasswordReset[]
+  invoices       Invoice[]
+  products       InvoiceProduct[]
+  invoiceCode    String?   // short code in invoice numbers, e.g. INV-WMR-261105-001
 }
 
 // One-time link to set a new merchant password (only the SHA-256 of the token is stored)
@@ -212,4 +215,57 @@ model AuditLog {
   action        String       // e.g. VIEW_KTP, APPROVE, EXPORT
   detail        String?
   createdAt     DateTime     @default(now())
+}
+
+
+enum InvoiceStatus {
+  UNPAID
+  PAID
+  SHIPPED
+  DONE
+  CANCELLED
+}
+
+// AIPOS Invoice: invoices a merchant sends to customers, with their QRIS attached when shared.
+model Invoice {
+  id            String        @id @default(cuid())
+  userId        String
+  user          User          @relation(fields: [userId], references: [id], onDelete: Cascade)
+  number        String        // INV-CODE-YYMMDD-001
+  customerName  String
+  customerPhone String?
+  orderDate     String        // YYYY-MM-DD
+  note          String?
+  items         Json          // [{ productId?, name, price, qty, note? }]
+  deliveryType  String        // "ambil" | "kirim"
+  deliveryAddress String?
+  deliveryFee   Int           @default(0)
+  discountType  String        @default("rp") // "rp" | "pct"
+  discountValue Int           @default(0)
+  taxPct        Float         @default(0)
+  subtotal      Int
+  discount      Int
+  tax           Int
+  total         Int
+  status        InvoiceStatus @default(UNPAID)
+  payMethod     String?
+  paidAt        DateTime?
+  history       Json          // [{ s: status, at: ISO time, m?: pay method }]
+  createdAt     DateTime      @default(now())
+  updatedAt     DateTime      @updatedAt
+
+  @@unique([userId, number])
+  @@index([userId, createdAt])
+}
+
+model InvoiceProduct {
+  id        String   @id @default(cuid())
+  userId    String
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  name      String
+  price     Int
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([userId, name])
 }

@@ -293,3 +293,38 @@ button, input, select, textarea { font: inherit; }
 .pin-boxes.bad .pin-box { border-color: var(--err); }
 .pin-dot { width: 12px; height: 12px; border-radius: 50%; background: var(--ink); display: block; animation: pop .25s ease both; }
 .pin-eye { background: none; border: 0; color: var(--muted); cursor: pointer; min-width: 40px; min-height: 32px; display: inline-flex; align-items: center; justify-content: flex-end; }
+
+/* Invoice */
+.tab-row { display: flex; gap: 8px; overflow-x: auto; margin: 0 -16px; padding: 0 16px 2px; scrollbar-width: none; }
+.tab-row::-webkit-scrollbar { display: none; }
+.tab-row .chip { white-space: nowrap; flex-shrink: 0; }
+.inv-row { display: flex; align-items: center; gap: 12px; padding: 14px; background: #fff; border: 1px solid var(--line); border-radius: 16px; color: var(--ink); text-decoration: none; }
+.inv-row:hover { color: var(--ink); border-color: #b9d3fb; }
+.fab { position: fixed; right: max(16px, calc(50% - 240px + 16px)); bottom: 96px; width: 56px; height: 56px; border-radius: 18px; background: var(--blue); color: #fff; display: inline-flex; align-items: center; justify-content: center; box-shadow: 0 10px 24px rgba(0,105,252,.35); z-index: 6; }
+.fab:hover { color: #fff; background: #0052c7; }
+.steps-bar { display: grid; grid-template-columns: repeat(3, 1fr); gap: 6px; }
+.steps-bar i { height: 4px; border-radius: 2px; background: rgba(255,255,255,.35); }
+.steps-bar i.on { background: #fff; }
+.line-item { display: flex; gap: 10px; align-items: center; padding: 12px 0; border-bottom: 1px solid var(--line); }
+.qty { display: inline-flex; align-items: center; border: 1px solid var(--line-2); border-radius: 10px; overflow: hidden; }
+.qty button { width: 36px; height: 36px; border: 0; background: #f2f5fa; color: var(--ink); font-size: 18px; font-weight: 700; cursor: pointer; }
+.qty span { min-width: 34px; text-align: center; font-weight: 700; font-size: 14px; }
+.sum-row { display: flex; justify-content: space-between; gap: 12px; font-size: 14px; padding: 6px 0; }
+.sum-row.total { font-size: 17px; font-weight: 800; border-top: 1px solid var(--line); padding-top: 12px; margin-top: 4px; }
+.bottom-bar { position: sticky; bottom: 84px; background: #fff; border-top: 1px solid var(--line); padding: 12px 16px; margin: 0 -16px -24px; display: flex; gap: 10px; align-items: center; z-index: 4; }
+.timeline { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 0; }
+.timeline li { display: flex; gap: 12px; position: relative; padding-bottom: 16px; }
+.timeline li:not(:last-child)::before { content: ''; position: absolute; left: 11px; top: 24px; bottom: 0; width: 2px; background: var(--line); }
+.timeline li.done:not(:last-child)::before { background: #12b76a; }
+.timeline .dot { width: 24px; height: 24px; border-radius: 50%; border: 2px solid var(--line-2); background: #fff; display: inline-flex; align-items: center; justify-content: center; flex-shrink: 0; color: #fff; }
+.timeline li.done .dot { background: #12b76a; border-color: #12b76a; }
+.timeline li.cur .dot { border-color: var(--blue); }
+.money-input { display: flex; align-items: center; gap: 6px; border: 1px solid var(--line-2); border-radius: 10px; background: #fff; padding: 0 12px; min-height: 44px; }
+.money-input span { font-size: 14px; font-weight: 700; color: var(--muted); }
+.money-input input { border: 0; outline: 0; flex: 1; min-width: 0; font-size: 15px; font-weight: 600; background: none; color: var(--ink); }
+.money-input:focus-within { outline: 2px solid var(--blue); outline-offset: 1px; border-color: var(--blue); }
+.seg-mini { display: inline-flex; border: 1px solid var(--line-2); border-radius: 10px; overflow: hidden; flex-shrink: 0; }
+.seg-mini button { min-width: 46px; min-height: 44px; border: 0; background: #fff; font-weight: 700; color: var(--muted); cursor: pointer; }
+.seg-mini button[aria-checked="true"] { background: var(--blue); color: #fff; }
+.inv-preview { background: #fff; border: 1px solid var(--line); border-radius: 16px; padding: 10px; min-height: 240px; display: flex; align-items: center; justify-content: center; }
+.inv-preview img { width: 100%; height: auto; border-radius: 8px; display: block; }

@@ -51,15 +51,15 @@ export default function HomeClient({ app, isNew }: { app: AppView; isNew: boolea
     { icon: 'qris', label: 'QRIS', href: '/app/qris' },
     { icon: 'list', label: 'Mutasi', href: '/app/transaksi' },
     { icon: 'creditCard', label: 'Pencairan', href: '/app/pencairan' },
-    { icon: 'file', label: 'Laporan', action: soon, soon: true }
+    { icon: 'file', label: 'Invoice', href: '/app/invoice' }
   ];
   const features: Feature[] = [
     { icon: 'speaker', label: 'Soundbox', action: () => { setSbWay(active && app.product === 'SOUNDBOX' ? 'arrived' : 'buy'); setSheet('sb'); } },
     { icon: 'store', label: 'Toko saya', href: '/app/akun#toko' },
-    { icon: 'users', label: 'Anggota', action: soon, soon: true },
     { icon: 'printer', label: 'Pesan stiker', href: waLink(`Halo AIPOS, saya mau pesan stiker QRIS cetak untuk ${app.businessName} (${app.ticket}).`), external: true },
     { icon: 'edc', label: 'Beli EDC', href: 'https://hausjo.id/produk', external: true },
     { icon: 'gift', label: 'Referral', action: soon, soon: true },
+    { icon: 'sort', label: 'Laporan', action: soon, soon: true },
     { icon: 'help', label: 'Bantuan', href: waLink(`Halo AIPOS, saya butuh bantuan. Tiket ${app.ticket}.`), external: true },
     { icon: 'grid', label: 'Lainnya', href: '/app/akun' }
   ];
