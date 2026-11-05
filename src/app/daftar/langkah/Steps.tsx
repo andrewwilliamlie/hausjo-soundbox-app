@@ -71,7 +71,8 @@ export default function Steps({ initial, uploaded, product, startStep = 0, known
   function payload(s: number) {
     if (s === 1) return { ktpName: d.ktpName, nik: d.nik, birthPlace: d.birthPlace, birthDate: d.birthDate, gender: d.gender, ktpAddress: d.ktpAddress, ocrEdited };
     if (s === 2) {
-      const { ktpName, nik: _n, birthPlace, birthDate, gender, ktpAddress, ocrConfidence, lat, lng, ...rest } = d;
+      // Only the store fields: owner data was saved in step 1 and the payout account is saved in step 3.
+      const { ktpName, nik: _n, birthPlace, birthDate, gender, ktpAddress, ocrConfidence, lat, lng, bankName, accountNo, accountHolder, settlement, ...rest } = d;
       // Manual address: the GPS point is cleared so the store pin is never somewhere else.
       return { ...rest, lat: locMode === 'gps' ? lat : null, lng: locMode === 'gps' ? lng : null };
     }

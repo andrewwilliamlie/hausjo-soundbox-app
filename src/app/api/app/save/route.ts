@@ -49,7 +49,12 @@ export async function POST(req: Request) {
   if (app.status !== 'DRAFT') return NextResponse.json({ error: 'Pendaftaran sudah terkirim' }, { status: 409 });
 
   const parsed = fields.safeParse(await req.json().catch(() => ({})));
-  if (!parsed.success) return NextResponse.json({ error: 'Data tidak valid' }, { status: 400 });
+  if (!parsed.success) {
+    const field = String(parsed.error.issues[0]?.path[0] ?? '');
+    const LABEL: Record<string, string> = { accountNo: 'nomor rekening', accountHolder: 'nama pemilik rekening', bankName: 'bank', businessName: 'nama usaha', postalCode: 'kode pos', villageCode: 'kelurahan/desa', lat: 'lokasi', lng: 'lokasi' };
+    console.warn('[save] invalid field', field);
+    return NextResponse.json({ error: `Periksa lagi ${LABEL[field] ?? field || 'data'}` }, { status: 400 });
+  }
   const { copyBankFrom, ...data } = parsed.data;
   // "Pakai rekening yang sama": copy the payout account from another store of the same owner.
   if (copyBankFrom) {
