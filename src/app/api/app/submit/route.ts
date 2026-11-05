@@ -23,6 +23,7 @@ export async function POST() {
   if (!checkNik(app.nik ?? '').ok) missing.push('NIK 16 digit');
   if (!checkBusinessName(app.businessName ?? '').ok) missing.push('nama usaha yang sesuai aturan');
   if (!app.businessType) missing.push('jenis usaha');
+  if (!app.accountNo) missing.push('rekening pencairan');
   if (!app.street || !app.kelurahan || !app.kecamatan || !app.city || !app.province) missing.push('alamat toko lengkap');
   if (missing.length) return NextResponse.json({ error: 'Belum lengkap: ' + missing.join(', ') }, { status: 400 });
 

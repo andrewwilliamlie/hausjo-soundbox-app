@@ -31,7 +31,12 @@ const fields = z
     villageCode: z.string().trim().regex(/^(\d{2}\.\d{2}\.\d{2}\.\d{4})?$/),
     lat: z.number().min(-12).max(7).nullable(),
     lng: z.number().min(94).max(142).nullable(),
-    turnover: z.enum(['UMI', 'UKE', 'UME', 'UBE'])
+    turnover: z.enum(['UMI', 'UKE', 'UME', 'UBE']),
+    bankName: z.string().trim().min(2).max(40),
+    accountNo: z.string().regex(/^\d{6,20}$/),
+    accountHolder: z.string().trim().min(3).max(100),
+    settlement: z.enum(['H1', 'SAME_DAY']),
+    copyBankFrom: z.string().max(40)
   })
   .partial();
 
@@ -45,7 +50,13 @@ export async function POST(req: Request) {
 
   const parsed = fields.safeParse(await req.json().catch(() => ({})));
   if (!parsed.success) return NextResponse.json({ error: 'Data tidak valid' }, { status: 400 });
-  const data = { ...parsed.data };
+  const { copyBankFrom, ...data } = parsed.data;
+  // "Pakai rekening yang sama": copy the payout account from another store of the same owner.
+  if (copyBankFrom) {
+    const src = await db.application.findFirst({ where: { id: copyBankFrom, userId: uid }, select: { bankName: true, accountNo: true, accountHolder: true } });
+    if (!src?.accountNo) return NextResponse.json({ error: 'Rekening tidak ditemukan' }, { status: 400 });
+    Object.assign(data, { bankName: src.bankName, accountNo: src.accountNo, accountHolder: src.accountHolder });
+  }
   if (data.businessName) data.businessName = data.businessName.toUpperCase();
   if (app.ocrEdited) data.ocrEdited = true; // once edited, stays flagged for the admin
 

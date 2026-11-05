@@ -5,7 +5,7 @@ import Icon, { IconTile } from '@/components/Icon';
 import LiveSelfie from './LiveSelfie';
 import { Upload } from './Upload';
 import BusinessTypePicker from './BusinessTypePicker';
-import { BUSINESS_CATEGORIES } from '@/lib/provinces';
+import { BANKS, BUSINESS_CATEGORIES } from '@/lib/provinces';
 import RegionPicker, { matchRegion, type GeoAddress } from './RegionPicker';
 import { checkBusinessName, checkNik } from '@/lib/rules';
 
@@ -18,7 +18,11 @@ type Data = {
   businessType: string; businessName: string;
   street: string; number: string; rt: string; rw: string; kelurahan: string; kecamatan: string; city: string; province: string; postalCode: string; villageCode: string;
   lat: number | null; lng: number | null; turnover: string;
+  bankName: string; accountNo: string; accountHolder: string; settlement: 'H1' | 'SAME_DAY';
 };
+
+/** A payout account already used by another store of the same owner (number shown masked). */
+export type KnownBank = { fromId: string; label: string; holder: string };
 
 const OCR_KEYS = ['ktpName', 'nik', 'birthPlace', 'birthDate', 'ktpAddress'] as const;
 const TURNOVER: Array<[string, string]> = [
@@ -40,8 +44,10 @@ async function post(url: string, body?: unknown) {
   return json;
 }
 
-export default function Steps({ initial, uploaded, product, startStep = 0 }: { initial: Data; uploaded: Record<string, boolean>; product: string; startStep?: number }) {
-  const [step, setStep] = useState(startStep); // 0 intro, 1 KTP, 2 usaha, 3 konfirmasi
+export default function Steps({ initial, uploaded, product, startStep = 0, knownBanks = [] }: { initial: Data; uploaded: Record<string, boolean>; product: string; startStep?: number; knownBanks?: KnownBank[] }) {
+  const [step, setStep] = useState(startStep); // 0 intro, 1 KTP, 2 usaha, 3 rekening, 4 konfirmasi, 5 terkirim
+  // Payout account: reuse one from another store of this owner, or type a new one.
+  const [bankChoice, setBankChoice] = useState<string>(initial.accountNo ? 'other' : knownBanks.length ? '' : 'other');
   const [d, setD] = useState<Data>(initial);
   const [up, setUp] = useState<Record<string, boolean>>(uploaded);
   const [ocrFilled, setOcrFilled] = useState(initial.ocrConfidence != null);
@@ -69,6 +75,11 @@ export default function Steps({ initial, uploaded, product, startStep = 0 }: { i
       // Manual address: the GPS point is cleared so the store pin is never somewhere else.
       return { ...rest, lat: locMode === 'gps' ? lat : null, lng: locMode === 'gps' ? lng : null };
     }
+    if (s === 3) {
+      const base = { settlement: d.settlement };
+      if (bankChoice.startsWith('same:')) return { ...base, copyBankFrom: bankChoice.slice(5) };
+      return { ...base, bankName: d.bankName, accountNo: d.accountNo.replace(/\D/g, ''), accountHolder: d.accountHolder.trim().toUpperCase() };
+    }
     return undefined;
   }
 
@@ -90,6 +101,14 @@ export default function Steps({ initial, uploaded, product, startStep = 0 }: { i
       if (!up.STORE_FRONT || !up.PRODUCT) return 'Unggah foto depan toko dan foto produk';
       if (d.sellsOnline && !d.onlineLink.trim()) return 'Isi link toko online';
     }
+    if (s === 3) {
+      if (!bankChoice) return 'Pilih rekening yang sama atau rekening lain';
+      if (bankChoice === 'other') {
+        if (!d.bankName) return 'Pilih bank';
+        if (!/^\d{6,20}$/.test(d.accountNo.replace(/\D/g, ''))) return 'Nomor rekening hanya angka (6–20 digit)';
+        if (d.accountHolder.trim().length < 3) return 'Isi nama pemilik rekening';
+      }
+    }
     return '';
   }
 
@@ -101,10 +120,10 @@ export default function Steps({ initial, uploaded, product, startStep = 0 }: { i
     try {
       const body = payload(step);
       if (body) await post('/api/app/save', body);
-      if (step === 3) {
+      if (step === 4) {
         const res = await post('/api/app/submit');
         setTicket(res.ticket || '');
-        setStep(4);
+        setStep(5);
         window.scrollTo({ top: 0 });
         return;
       }
@@ -164,28 +183,28 @@ export default function Steps({ initial, uploaded, product, startStep = 0 }: { i
     setLocMsg('');
   }
 
-  const labels = ['Foto e-KTP & selfie', 'Data usaha', 'Konfirmasi'];
+  const labels = ['Foto e-KTP & selfie', 'Data usaha', 'Rekening', 'Konfirmasi'];
 
   return (
     <main className="content">
-      {step > 0 && step < 4 && (
+      {step > 0 && step < 5 && (
         <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
-          <span className="hint" style={{ fontWeight: 600 }}>Langkah {step} dari 3 · {labels[step - 1]}</span>
+          <span className="hint" style={{ fontWeight: 600 }}>Langkah {step} dari 4 · {labels[step - 1]}</span>
           <div className="steps" aria-hidden="true">{labels.map((_, i) => <i key={i} className={i < step ? 'on' : ''} />)}</div>
         </div>
       )}
 
       {step === 0 && (
         <div className="screen-in" style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
-          <h1 style={{ margin: 0, fontSize: 24, fontWeight: 800 }}>3 langkah, sekitar 5 menit</h1>
+          <h1 style={{ margin: 0, fontSize: 24, fontWeight: 800 }}>4 langkah, sekitar 5 menit</h1>
           <p className="hint" style={{ fontSize: 13.5 }}>Lakukan di toko Anda dan siapkan e-KTP asli.</p>
-          {([['ktp', 'blue', '1 · Foto e-KTP & selfie', 'Data KTP terbaca otomatis bila tersedia'], ['store', 'orange', '2 · Data usaha', 'Lokasi toko dan foto toko'], ['checkCircle', 'green', '3 · Konfirmasi', 'Periksa, lalu kirim']] as const).map(([ic, tone, t, s], i) => (
+          {([['ktp', 'blue', '1 · Foto e-KTP & selfie', 'Data KTP terbaca otomatis bila tersedia'], ['store', 'orange', '2 · Data usaha', 'Lokasi toko dan foto toko'], ['bank', 'purple', '3 · Rekening', 'Tujuan pencairan uang QRIS'], ['checkCircle', 'green', '4 · Konfirmasi', 'Periksa, lalu kirim sekali']] as const).map(([ic, tone, t, s], i) => (
             <div key={t} className={`card rise rise-${i + 1}`} style={{ padding: 14, flexDirection: 'row', alignItems: 'center', gap: 14 }}>
               <IconTile name={ic} tone={tone} />
               <span style={{ display: 'flex', flexDirection: 'column', gap: 2 }}><strong style={{ fontSize: 15 }}>{t}</strong><span className="hint">{s}</span></span>
             </div>
           ))}
-          <div className="note rise rise-4">Setelah dikirim, Anda langsung masuk aplikasi. Tambah rekening{product === 'SOUNDBOX' ? ' dan urus Soundbox' : ''} dari sana sambil kami memeriksa data.</div>
+          <div className="note rise rise-4">Siapkan e-KTP dan nomor rekening. Setelah dikirim, Anda langsung masuk aplikasi{product === 'SOUNDBOX' ? ' dan bisa mengurus Soundbox' : ''} sambil kami memeriksa data.</div>
         </div>
       )}
 
@@ -286,13 +305,50 @@ export default function Steps({ initial, uploaded, product, startStep = 0 }: { i
 
       {step === 3 && (
         <div className="screen-in" style={{ display: 'flex', flexDirection: 'column', gap: 14 }}>
+          <div style={{ display: 'flex', gap: 12, alignItems: 'center' }}><IconTile name="bank" /><h1 style={{ margin: 0, fontSize: 22, fontWeight: 800 }}>Rekening pencairan</h1></div>
+          <p className="hint">Uang dari pembayaran QRIS dicairkan ke rekening ini. Wajib diisi agar bank bisa menerbitkan QRIS.</p>
+          {knownBanks.length > 0 && (
+            <div role="radiogroup" aria-label="Rekening" style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
+              {knownBanks.map((b) => (
+                <button key={b.fromId} type="button" role="radio" aria-checked={bankChoice === 'same:' + b.fromId} className="cat-row tap" onClick={() => setBankChoice('same:' + b.fromId)}>
+                  <span className={`radio-dot${bankChoice === 'same:' + b.fromId ? ' on' : ''}`} aria-hidden="true" />
+                  <span style={{ flex: 1, display: 'flex', flexDirection: 'column', gap: 2, textAlign: 'left' }}><strong style={{ fontSize: 14.5 }}>Pakai rekening yang sama</strong><span className="hint">{b.label} · a.n. {b.holder}</span></span>
+                  <IconTile name="bank" size={40} />
+                </button>
+              ))}
+              <button type="button" role="radio" aria-checked={bankChoice === 'other'} className="cat-row tap" onClick={() => setBankChoice('other')}>
+                <span className={`radio-dot${bankChoice === 'other' ? ' on' : ''}`} aria-hidden="true" />
+                <span style={{ flex: 1, display: 'flex', flexDirection: 'column', gap: 2, textAlign: 'left' }}><strong style={{ fontSize: 14.5 }}>Rekening lain</strong><span className="hint">Isi rekening berbeda untuk toko ini</span></span>
+                <IconTile name="plus" tone="slate" size={40} />
+              </button>
+            </div>
+          )}
+          {bankChoice === 'other' && (
+            <div className="fade-in" style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
+              <label className="field">Bank<select className="input" value={d.bankName} onChange={(e) => set('bankName', e.target.value)}>{BANKS.map((b) => <option key={b}>{b}</option>)}</select></label>
+              <label className="field">Nomor rekening<input className="input" inputMode="numeric" value={d.accountNo} onChange={(e) => set('accountNo', e.target.value.replace(/[^\d ]/g, ''))} placeholder="Contoh: 1234567890" /></label>
+              <label className="field">Nama pemilik rekening<input className="input ocr" value={d.accountHolder} onChange={(e) => set('accountHolder', e.target.value.toUpperCase())} /><span className="hint">Harus sama dengan nama di e-KTP.</span></label>
+            </div>
+          )}
+          <span style={{ fontSize: 13, fontWeight: 600 }}>Kapan uang dicairkan?</span>
+          {([['H1', 'clock', 'H+1 (disarankan)', 'MDR 0% di bawah Rp500.000, 0,3% mulai Rp500.000. Rp2.000 per pencairan.'], ['SAME_DAY', 'sun', 'Hari yang sama', 'MDR 0,7%, tanpa biaya pencairan.']] as const).map(([v, ic, t, s]) => (
+            <button key={v} type="button" role="radio" aria-checked={d.settlement === v} className="choice" style={{ flexDirection: 'row', alignItems: 'center', gap: 12 }} onClick={() => set('settlement', v)}>
+              <Icon name={ic} size={24} color={d.settlement === v ? 'var(--blue)' : 'var(--muted)'} /><span style={{ display: 'flex', flexDirection: 'column', gap: 2 }}><strong style={{ fontSize: 14 }}>{t}</strong><span className="hint">{s}</span></span>
+            </button>
+          ))}
+        </div>
+      )}
+
+      {step === 4 && (
+        <div className="screen-in" style={{ display: 'flex', flexDirection: 'column', gap: 14 }}>
           <h1 style={{ margin: 0, fontSize: 22, fontWeight: 800 }}>Konfirmasi data</h1>
           <div className="card" style={{ padding: '4px 16px', gap: 0 }}>
             {([
               ['Pemilik', `${d.ktpName} · NIK ${d.nik.slice(0, 4)}…${d.nik.slice(-4)}`, 1],
               ['Usaha', `${d.businessName.toUpperCase()} · ${d.businessType}`, 2],
               ['Toko', `${d.hasStore ? 'Punya toko' : 'Tidak punya toko'} · ${[d.sellsOffline && 'offline', d.sellsOnline && 'online'].filter(Boolean).join(' & ')}`, 2],
-              ['Alamat', `${d.street} ${d.number}, ${d.kelurahan}, ${d.kecamatan}, ${d.city}, ${d.province}`, 2]
+              ['Alamat', `${d.street} ${d.number}, ${d.kelurahan}, ${d.kecamatan}, ${d.city}, ${d.province}`, 2],
+              ['Rekening', `${bankChoice.startsWith('same:') ? knownBanks.find((b) => 'same:' + b.fromId === bankChoice)?.label ?? '' : `${d.bankName} ${d.accountNo}`} · cair ${d.settlement === 'H1' ? 'H+1' : 'hari yang sama'}`, 3]
             ] as const).map(([label, value, s]) => (
               <div key={label} style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', gap: 12, padding: '12px 0', borderBottom: '1px solid var(--line)' }}>
                 <span style={{ display: 'flex', flexDirection: 'column', gap: 2 }}><span className="hint">{label}</span><span style={{ fontSize: 14, fontWeight: 600 }}>{value}</span></span>
@@ -307,7 +363,7 @@ export default function Steps({ initial, uploaded, product, startStep = 0 }: { i
         </div>
       )}
 
-      {step === 4 && (
+      {step === 5 && (
         <div className="screen-in" style={{ position: 'relative', display: 'flex', flexDirection: 'column', alignItems: 'center', textAlign: 'center', gap: 14, paddingTop: 24 }}>
           <div className="confetti" aria-hidden="true">
             {CONFETTI.map(([dx, c, delay], i) => <span key={i} style={{ background: c, animationDelay: `${delay}s`, ['--dx' as string]: `${dx}px` } as React.CSSProperties} />)}
@@ -320,7 +376,7 @@ export default function Steps({ initial, uploaded, product, startStep = 0 }: { i
           {ticket && <div className="card rise rise-2" style={{ padding: '12px 16px', gap: 2, alignItems: 'center' }}><span className="hint">Nomor tiket</span><strong style={{ fontSize: 17, letterSpacing: .5 }}>{ticket}</strong></div>}
           <div className="card rise rise-3" style={{ textAlign: 'left', width: '100%', gap: 12 }}>
             <strong style={{ fontSize: 15 }}>Sambil menunggu</strong>
-            <span style={{ display: 'flex', gap: 12, alignItems: 'center', fontSize: 14 }}><IconTile name="bank" size={36} />Tambah rekening pencairan (wajib)</span>
+            <span style={{ display: 'flex', gap: 12, alignItems: 'center', fontSize: 14 }}><IconTile name="clock" size={36} />Pantau status pendaftaran di Beranda</span>
             {product === 'SOUNDBOX' && <span style={{ display: 'flex', gap: 12, alignItems: 'center', fontSize: 14 }}><IconTile name="speaker" tone="orange" size={36} />Urus Soundbox Anda</span>}
           </div>
           <a href="/app" className="btn btn-primary btn-block rise rise-4" style={{ gap: 6 }}>Masuk ke aplikasi <Icon name="chevron" size={18} /></a>
@@ -328,10 +384,10 @@ export default function Steps({ initial, uploaded, product, startStep = 0 }: { i
       )}
 
       {error && <p className="err" role="alert">{error}</p>}
-      {step < 4 && <div style={{ display: 'flex', gap: 10, marginTop: 'auto', paddingTop: 8 }}>
+      {step < 5 && <div style={{ display: 'flex', gap: 10, marginTop: 'auto', paddingTop: 8 }}>
         {step > 0 && <button type="button" className="btn btn-ghost" onClick={() => { setError(''); setStep(step - 1); }}>Kembali</button>}
-        <button type="button" className="btn btn-primary" style={{ flex: 1 }} disabled={busy || (step === 3 && !agree)} onClick={next}>
-          {busy ? 'Menyimpan…' : step === 0 ? 'Mulai' : step === 3 ? 'Kirim pendaftaran' : 'Lanjut'}
+        <button type="button" className="btn btn-primary" style={{ flex: 1 }} disabled={busy || (step === 4 && !agree)} onClick={next}>
+          {busy ? 'Menyimpan…' : step === 0 ? 'Mulai' : step === 4 ? 'Kirim pendaftaran' : 'Lanjut'}
         </button>
       </div>}
     </main>
