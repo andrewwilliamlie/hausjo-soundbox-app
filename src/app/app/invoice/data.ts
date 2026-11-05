@@ -24,5 +24,5 @@ export async function invoiceContext() {
     nmid: app.nmid,
     qrisActive: app.status === 'ACTIVE' && !!sticker
   };
-  return { userId: user.id, shop };
+  return { userId: user.id, outletId: app.id, shop };
 }

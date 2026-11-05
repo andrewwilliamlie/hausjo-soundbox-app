@@ -3,16 +3,13 @@ import { db } from '@/lib/db';
 import { mails, sendMail } from '@/lib/mail';
 import { BUSINESS_CATEGORIES } from '@/lib/provinces';
 import { checkBusinessName, checkNik } from '@/lib/rules';
-import { merchantId } from '@/lib/auth';
+import { currentOutletId, merchantId } from '@/lib/auth';
 
 export async function POST() {
   const uid = await merchantId();
   if (!uid) return NextResponse.json({ error: 'Silakan masuk lagi' }, { status: 401 });
-  const app = await db.application.findFirst({
-    where: { userId: uid },
-    orderBy: { createdAt: 'desc' },
-    include: { documents: true, user: true }
-  });
+  const outletId = await currentOutletId(uid);
+  const app = outletId ? await db.application.findUnique({ where: { id: outletId }, include: { documents: true, user: true } }) : null;
   if (!app) return NextResponse.json({ error: 'Pendaftaran tidak ditemukan' }, { status: 404 });
   if (app.status !== 'DRAFT') return NextResponse.json({ ok: true });
 

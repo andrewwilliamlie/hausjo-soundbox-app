@@ -3,14 +3,15 @@
 import { revalidatePath } from 'next/cache';
 import { z } from 'zod';
 import { db } from '@/lib/db';
-import { merchantId } from '@/lib/auth';
+import { currentOutletId, merchantId } from '@/lib/auth';
 
 export type Result = { ok: boolean; error?: string; message?: string };
 
 async function myApp() {
   const uid = await merchantId();
   if (!uid) return null;
-  return db.application.findFirst({ where: { userId: uid }, orderBy: { createdAt: 'desc' } });
+  const outletId = await currentOutletId(uid);
+  return outletId ? db.application.findUnique({ where: { id: outletId } }) : null;
 }
 
 const bankSchema = z.object({

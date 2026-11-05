@@ -60,6 +60,7 @@ export default async function AdminPage({ searchParams }: { searchParams: Promis
     : null;
 
   const docs = cur?.documents.filter((d) => d.kind in DOC_LABEL) ?? [];
+  const ownerStores = cur ? await db.application.count({ where: { userId: cur.userId } }) : 0;
   const sticker = cur?.documents.find((d) => d.kind === 'QRIS_STICKER');
   const nameCheck = checkBusinessName(cur?.businessName ?? '');
   const allOk = cur ? ['KTP', 'SELFIE', 'STORE_FRONT', 'PRODUCT'].every((k) => docs.some((d) => d.kind === k && d.decision === 'APPROVED')) : false;
@@ -121,6 +122,7 @@ export default async function AdminPage({ searchParams }: { searchParams: Promis
                     {kv('Rekening', cur.accountNo ? `${cur.bankName} ${cur.accountNo} a.n. ${cur.accountHolder}` : 'Belum ditambahkan')}
                     {kv('Pencairan', cur.settlement === 'H1' ? 'H+1' : 'Hari yang sama')}
                     {kv('Referral', cur.user.referralCode)}
+                    {kv('Toko milik pemilik ini', ownerStores > 1 ? `${ownerStores} toko (cabang)` : '1 toko')}
                     {kv('Lokasi', cur.lat != null ? <a href={`https://maps.google.com/?q=${cur.lat},${cur.lng}`} target="_blank" rel="noreferrer">Buka peta</a> : '–')}
                   </div>
                   <Flag bad={!nameCheck.ok}>{nameCheck.ok ? `Nama usaha lolos aturan bank (${(cur.businessName ?? '').length}/25).` : 'Nama usaha: ' + nameCheck.message}</Flag>

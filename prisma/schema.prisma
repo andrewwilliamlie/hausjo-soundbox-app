@@ -231,6 +231,7 @@ model Invoice {
   id            String        @id @default(cuid())
   userId        String
   user          User          @relation(fields: [userId], references: [id], onDelete: Cascade)
+  applicationId String?       // the store (outlet) the invoice is from; its QRIS is attached
   number        String        // INV-CODE-YYMMDD-001
   customerName  String
   customerPhone String?

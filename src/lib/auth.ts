@@ -1,18 +1,33 @@
+import { cookies } from 'next/headers';
 import { redirect } from 'next/navigation';
 import { db } from './db';
 import { adminSession, merchantSession, staleSession } from './session';
 
-/** The logged-in merchant and their (single, v1) application, or redirect to /masuk. */
+// A merchant can have several stores (outlets); each is its own application with its own QRIS.
+// The one being viewed is remembered in this cookie; without it, the newest store is used.
+export const OUTLET_COOKIE = 'hj_outlet';
+
+/** Id of the store the merchant is looking at: the cookie's choice when it belongs to them, else their newest. */
+export async function currentOutletId(userId: string): Promise<string | null> {
+  const wanted = (await cookies()).get(OUTLET_COOKIE)?.value;
+  if (wanted) {
+    const own = await db.application.findFirst({ where: { id: wanted, userId }, select: { id: true } });
+    if (own) return own.id;
+  }
+  const latest = await db.application.findFirst({ where: { userId }, orderBy: { createdAt: 'desc' }, select: { id: true } });
+  return latest?.id ?? null;
+}
+
+/** The logged-in merchant, the store they are viewing, and how many stores they have; or redirect to /masuk. */
 export async function requireMerchant() {
   const s = await merchantSession();
   if (!s) redirect('/masuk');
-  const user = await db.user.findUnique({
-    where: { id: s.id },
-    include: { applications: { orderBy: { createdAt: 'desc' }, take: 1, include: { documents: true } } }
-  });
+  const user = await db.user.findUnique({ where: { id: s.id } });
   if (!user || staleSession(s, user.passwordChangedAt)) redirect('/masuk');
-  const application = user.applications[0] ?? null;
-  return { user, application };
+  const id = await currentOutletId(user.id);
+  const application = id ? await db.application.findUnique({ where: { id }, include: { documents: true } }) : null;
+  const outletCount = await db.application.count({ where: { userId: user.id } });
+  return { user, application, outletCount };
 }
 
 export type Role = 'REVIEWER' | 'ACTIVATION' | 'ADMIN';

@@ -10,8 +10,9 @@ export const metadata = { title: 'Invoice · AIPOS' };
 export const dynamic = 'force-dynamic';
 
 export default async function InvoicesPage() {
-  const { userId, shop } = await invoiceContext();
-  const list = await db.invoice.findMany({ where: { userId }, orderBy: { createdAt: 'desc' }, take: 300 });
+  const { userId, outletId, shop } = await invoiceContext();
+  // Invoices of the store being viewed (older ones made before stores existed show everywhere).
+  const list = await db.invoice.findMany({ where: { userId, OR: [{ applicationId: outletId }, { applicationId: null }] }, orderBy: { createdAt: 'desc' }, take: 300 });
   const rows: Row[] = list.map((i) => ({
     id: i.id, number: i.number, customerName: i.customerName, customerPhone: i.customerPhone ?? '', total: i.total,
     status: i.status as Status, deliveryType: i.deliveryType, createdAt: i.createdAt.toISOString(), paidAt: i.paidAt?.toISOString() ?? null,

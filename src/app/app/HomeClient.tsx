@@ -21,7 +21,7 @@ const SOON = 'Segera hadir. Fitur ini sedang kami siapkan.';
 
 type Feature = { icon: IconName; label: string; href?: string; external?: boolean; action?: () => void; soon?: boolean };
 
-export default function HomeClient({ app, isNew }: { app: AppView; isNew: boolean }) {
+export default function HomeClient({ app, isNew, outletCount }: { app: AppView; isNew: boolean; outletCount: number }) {
   const router = useRouter();
   const [sheet, setSheet] = useState<'' | 'bank' | 'sb'>('');
   const [sbWay, setSbWay] = useState<SbWay>('buy');
@@ -55,7 +55,7 @@ export default function HomeClient({ app, isNew }: { app: AppView; isNew: boolea
   ];
   const features: Feature[] = [
     { icon: 'speaker', label: 'Soundbox', action: () => { setSbWay(active && app.product === 'SOUNDBOX' ? 'arrived' : 'buy'); setSheet('sb'); } },
-    { icon: 'store', label: 'Toko saya', href: '/app/akun#toko' },
+    { icon: 'store', label: 'Toko saya', href: '/app/toko' },
     { icon: 'printer', label: 'Pesan stiker', href: waLink(`Halo AIPOS, saya mau pesan stiker QRIS cetak untuk ${app.businessName} (${app.ticket}).`), external: true },
     { icon: 'edc', label: 'Beli EDC', href: 'https://hausjo.id/produk', external: true },
     { icon: 'gift', label: 'Referral', action: soon, soon: true },
@@ -84,10 +84,10 @@ export default function HomeClient({ app, isNew }: { app: AppView; isNew: boolea
       <div className="app-top">
         <header className="app-head">
           <Logo white height={22} />
-          <span className="app-hello">
+          <Link href="/app/toko" className="app-hello" style={{ color: '#fff', textDecoration: 'none' }} aria-label="Pilih toko">
             <span>Selamat datang,</span>
-            <strong>{app.businessName}{app.area ? ` · ${app.area}` : ''}</strong>
-          </span>
+            <strong style={{ display: 'flex', alignItems: 'center', gap: 4 }}>{app.businessName}{app.area ? ` · ${app.area}` : ''}<Icon name="chevronDown" size={16} /></strong>
+          </Link>
           <button type="button" className="bell" aria-label={needsAction ? 'Ada yang perlu dilengkapi' : 'Notifikasi'}
             onClick={() => document.getElementById('aktivasi')?.scrollIntoView({ behavior: 'smooth' })}>
             <Icon name="bell" size={22} />{needsAction && <span className="bell-dot" />}
@@ -125,7 +125,7 @@ export default function HomeClient({ app, isNew }: { app: AppView; isNew: boolea
             <Icon name="search" size={18} color="var(--muted)" />
             <input value={query} onChange={(e) => setQuery(e.target.value)} placeholder="Cari fitur" aria-label="Cari fitur" />
           </label>
-          <button type="button" className="pill-btn" onClick={soon}><Icon name="store" size={18} />Ganti toko</button>
+          <Link href="/app/toko" className="pill-btn" style={{ textDecoration: 'none' }}><Icon name="store" size={18} />{outletCount > 1 ? `Ganti toko (${outletCount})` : 'Tambah toko'}</Link>
         </div>
 
         <div className="feat-grid">

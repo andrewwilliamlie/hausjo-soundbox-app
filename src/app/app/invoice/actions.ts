@@ -3,7 +3,7 @@
 import { Prisma } from '@prisma/client';
 import { revalidatePath } from 'next/cache';
 import { z } from 'zod';
-import { merchantId } from '@/lib/auth';
+import { currentOutletId, merchantId } from '@/lib/auth';
 import { db } from '@/lib/db';
 import { FLOW, PAY_METHODS, codeFromName, todayISO, totals, type Status } from '@/lib/invoice';
 
@@ -33,7 +33,11 @@ const input = z.object({
 async function me() {
   const id = await merchantId();
   if (!id) return null;
-  return db.user.findUnique({ where: { id }, include: { applications: { orderBy: { createdAt: 'desc' }, take: 1 } } });
+  const user = await db.user.findUnique({ where: { id } });
+  if (!user) return null;
+  const outletId = await currentOutletId(id);
+  const outlet = outletId ? await db.application.findUnique({ where: { id: outletId }, select: { id: true, businessName: true } }) : null;
+  return { ...user, outlet };
 }
 
 async function nextNumber(userId: string, code: string) {
@@ -68,11 +72,11 @@ export async function saveInvoice(raw: unknown, editId?: string): Promise<Res<st
     return { ok: true, data: inv.id };
   }
 
-  const code = user.invoiceCode || codeFromName(user.applications[0]?.businessName ?? '');
+  const code = user.invoiceCode || codeFromName(user.outlet?.businessName ?? '');
   for (let attempt = 0; attempt < 4; attempt++) {
     try {
       const inv = await db.invoice.create({
-        data: { ...data, userId: user.id, number: await nextNumber(user.id, code), status: 'UNPAID', history: [{ s: 'UNPAID', at: new Date().toISOString() }] }
+        data: { ...data, userId: user.id, applicationId: user.outlet?.id ?? null, number: await nextNumber(user.id, code), status: 'UNPAID', history: [{ s: 'UNPAID', at: new Date().toISOString() }] }
       });
       revalidatePath('/app/invoice');
       return { ok: true, data: inv.id };

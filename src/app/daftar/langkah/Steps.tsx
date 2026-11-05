@@ -40,8 +40,8 @@ async function post(url: string, body?: unknown) {
   return json;
 }
 
-export default function Steps({ initial, uploaded, product }: { initial: Data; uploaded: Record<string, boolean>; product: string }) {
-  const [step, setStep] = useState(0); // 0 intro, 1 KTP, 2 usaha, 3 konfirmasi
+export default function Steps({ initial, uploaded, product, startStep = 0 }: { initial: Data; uploaded: Record<string, boolean>; product: string; startStep?: number }) {
+  const [step, setStep] = useState(startStep); // 0 intro, 1 KTP, 2 usaha, 3 konfirmasi
   const [d, setD] = useState<Data>(initial);
   const [up, setUp] = useState<Record<string, boolean>>(uploaded);
   const [ocrFilled, setOcrFilled] = useState(initial.ocrConfidence != null);

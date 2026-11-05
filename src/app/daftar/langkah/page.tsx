@@ -8,17 +8,21 @@ export const metadata = { title: 'Langkah pendaftaran · AIPOS' };
 export const dynamic = 'force-dynamic';
 
 export default async function LangkahPage() {
-  const { application: app } = await requireMerchant();
+  const { application: app, outletCount } = await requireMerchant();
   if (!app) redirect('/daftar');
   if (app.status !== 'DRAFT') redirect('/app');
 
   const uploaded = Object.fromEntries(app.documents.map((d) => [d.kind, true]));
+  // An extra store reuses the owner's e-KTP and selfie, so it starts at the store details.
+  const startStep = outletCount > 1 && uploaded.KTP && uploaded.SELFIE && app.ktpName ? 2 : 0;
   return (
     <div className="shell">
       <header className="topbar">
         <Link href="/" aria-label="AIPOS beranda"><Logo height={26} /></Link>
+        {outletCount > 1 && <Link href="/app/toko" style={{ fontSize: 13.5, fontWeight: 700, textDecoration: 'none' }}>Toko lain</Link>}
       </header>
       <Steps
+        startStep={startStep}
         initial={{
           ktpName: app.ktpName ?? '',
           nik: app.nik ?? '',
