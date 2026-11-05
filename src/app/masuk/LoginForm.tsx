@@ -5,6 +5,7 @@ import Link from 'next/link';
 import { useActionState, useState } from 'react';
 import Icon, { type IconName } from '@/components/Icon';
 import { CS_EMAIL, CS_WHATSAPP_DISPLAY, waLink } from '@/lib/contact';
+import PinInput from '@/components/PinInput';
 import { login, type LoginState } from './actions';
 
 type PanelKind = '' | 'login' | 'fees' | 'how' | 'official';
@@ -24,6 +25,7 @@ function Panel({ label, onClose, children }: { label: string; onClose: () => voi
 export default function WelcomeLogin({ storeName, openForm }: { storeName: string; openForm: boolean }) {
   const [panel, setPanel] = useState<PanelKind>(openForm ? 'login' : '');
   const [note, setNote] = useState('');
+  const [legacy, setLegacy] = useState(false);
   const [state, action, pending] = useActionState<LoginState, FormData>(login, { error: null });
   const showLogin = panel === 'login';
 
@@ -86,13 +88,16 @@ export default function WelcomeLogin({ storeName, openForm }: { storeName: strin
             <label className="field">Nomor WhatsApp atau email
               <input className="input" name="id" autoComplete="username" required autoFocus />
             </label>
-            <label className="field">Kata sandi
-              <input className="input" name="password" type="password" autoComplete="current-password" required />
-            </label>
+            {legacy
+              ? <label className="field">Kata sandi lama<input className="input" name="password" type="password" autoComplete="current-password" required /></label>
+              : <PinInput label="PIN (6 angka)" name="pin" />}
+            <button type="button" onClick={() => setLegacy((x) => !x)} className="hint" style={{ background: 'none', border: 0, padding: 0, textAlign: 'left', textDecoration: 'underline', cursor: 'pointer' }}>
+              {legacy ? 'Masuk dengan PIN' : 'Akun lama dengan kata sandi? Masuk di sini'}
+            </button>
             {state.error && <p className="err" role="alert">{state.error}</p>}
             <button type="submit" className="btn btn-primary btn-block pill" disabled={pending}>{pending ? 'Masuk…' : 'Masuk'}</button>
             <p className="hint" style={{ display: 'flex', justifyContent: 'space-between' }}>
-              <Link href="/masuk/lupa" style={{ fontWeight: 700 }}>Lupa kata sandi?</Link>
+              <Link href="/masuk/lupa" style={{ fontWeight: 700 }}>Lupa PIN?</Link>
               <Link href="/daftar" style={{ fontWeight: 700 }}>Daftar gratis</Link>
             </p>
           </form>

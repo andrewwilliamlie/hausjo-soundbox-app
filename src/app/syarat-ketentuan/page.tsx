@@ -60,7 +60,7 @@ const sections: Section[] = [
     list: [
       'Memakai QRIS hanya untuk transaksi penjualan barang atau jasa yang sebenarnya dari usaha yang didaftarkan.',
       'Tidak membebankan biaya tambahan kepada pembeli yang membayar dengan QRIS (surcharge).',
-      'Menjaga kerahasiaan kata sandi akun dan segera memberi tahu AIPOS bila akun diduga disalahgunakan.',
+      'Menjaga kerahasiaan PIN akun dan segera memberi tahu AIPOS bila akun diduga disalahgunakan.',
       'Memasang stiker QRIS asli dari AIPOS dan tidak menggantinya dengan kode lain.'
     ]
   },

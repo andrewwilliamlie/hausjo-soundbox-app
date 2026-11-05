@@ -3,7 +3,8 @@
 import Link from 'next/link';
 import { useActionState, useState } from 'react';
 import Icon from '@/components/Icon';
-import { suggestEmail } from '@/lib/rules';
+import PinInput from '@/components/PinInput';
+import { checkPin, suggestEmail } from '@/lib/rules';
 import { createAccount, type FormState } from './actions';
 
 export default function DaftarForm({ initialProduct }: { initialProduct: 'soundbox' | 'qris' }) {
@@ -11,6 +12,9 @@ export default function DaftarForm({ initialProduct }: { initialProduct: 'soundb
   const [product, setProduct] = useState(initialProduct);
   const [email, setEmail] = useState('');
   const fix = suggestEmail(email);
+  const [pin, setPin] = useState('');
+  const [pin2, setPin2] = useState('');
+  const pinCheck = checkPin(pin);
 
   return (
     <form action={action} className="content screen-in">
@@ -53,9 +57,14 @@ export default function DaftarForm({ initialProduct }: { initialProduct: 'soundb
           </span>
         )}
       </label>
-      <label className="field">Buat kata sandi
-        <input className="input" name="password" type="password" autoComplete="new-password" minLength={8} placeholder="Minimal 8 karakter" required />
-      </label>
+      <PinInput label="Buat PIN (6 angka)" name="pin" value={pin} onChange={setPin} autoComplete="new-password" bad={pin.length === 6 && !pinCheck.ok}
+        hint={<span className={pin.length === 6 ? (pinCheck.ok ? 'okmsg' : 'err') : 'hint'}>{pin.length === 6 ? pinCheck.message : 'Dipakai untuk masuk ke aplikasi. Hindari tanggal lahir.'}</span>} />
+      {pin.length === 6 && pinCheck.ok && (
+        <div className="fade-in">
+          <PinInput label="Ulangi PIN" name="pin2" value={pin2} onChange={setPin2} autoComplete="new-password" bad={pin2.length === 6 && pin2 !== pin}
+            hint={pin2.length === 6 ? <span className={pin2 === pin ? 'okmsg' : 'err'}>{pin2 === pin ? 'PIN cocok' : 'PIN tidak sama'}</span> : undefined} />
+        </div>
+      )}
       <label className="field">Kode referral <span style={{ fontWeight: 500, color: 'var(--muted)' }}>(opsional)</span>
         <input className="input" name="referral" placeholder="Dari agen atau sales AIPOS" />
       </label>

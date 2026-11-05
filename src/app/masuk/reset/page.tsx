@@ -5,7 +5,7 @@ import { hashToken } from '@/lib/passwords';
 import ResetForm from './ResetForm';
 
 export const dynamic = 'force-dynamic';
-export const metadata = { title: 'Kata sandi baru · AIPOS', robots: { index: false } };
+export const metadata = { title: 'PIN baru · AIPOS', robots: { index: false } };
 
 export default async function ResetPage({ searchParams }: { searchParams: Promise<{ t?: string }> }) {
   const { t = '' } = await searchParams;

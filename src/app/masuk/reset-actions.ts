@@ -3,9 +3,9 @@
 import bcrypt from 'bcryptjs';
 import { redirect } from 'next/navigation';
 import { db } from '@/lib/db';
-import { hashToken, MIN_PASSWORD } from '@/lib/passwords';
+import { hashToken } from '@/lib/passwords';
 import { createResetLink } from '@/lib/reset';
-import { normalisePhone } from '@/lib/rules';
+import { checkPin, normalisePhone } from '@/lib/rules';
 import { startMerchantSession } from '@/lib/session';
 
 export type ForgotState = { error: string | null; sent?: boolean };
@@ -27,15 +27,16 @@ export async function resetPassword(_prev: ResetState, form: FormData): Promise<
   const token = String(form.get('t') || '');
   const next = String(form.get('next') || '');
   const again = String(form.get('again') || '');
-  if (next.length < MIN_PASSWORD) return { error: `Kata sandi minimal ${MIN_PASSWORD} karakter` };
-  if (next !== again) return { error: 'Ulangi kata sandi dengan sama persis' };
+  const pc = checkPin(next);
+  if (!pc.ok) return { error: pc.message };
+  if (next !== again) return { error: 'Ulangi PIN dengan angka yang sama' };
   const row = await db.passwordReset.findUnique({ where: { tokenHash: hashToken(token) } });
   if (!row || row.usedAt || row.expiresAt < new Date()) {
     return { error: 'Link sudah kedaluwarsa atau sudah dipakai. Minta link baru.' };
   }
   const now = new Date();
   await db.$transaction([
-    db.user.update({ where: { id: row.userId }, data: { passwordHash: await bcrypt.hash(next, 12), passwordChangedAt: new Date(now.getTime() - 2000) } }),
+    db.user.update({ where: { id: row.userId }, data: { passwordHash: await bcrypt.hash(next, 12), passwordChangedAt: new Date(now.getTime() - 2000), failedLogins: 0, lockedUntil: null } }),
     // Every outstanding link for this merchant stops working once one is used.
     db.passwordReset.updateMany({ where: { userId: row.userId, usedAt: null }, data: { usedAt: now } })
   ]);

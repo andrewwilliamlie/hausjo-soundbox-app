@@ -55,3 +55,16 @@ export function isValidPhone(raw: string): boolean {
 export function mdrLabel(settlement: 'H1' | 'SAME_DAY'): string {
   return settlement === 'H1' ? '0% (< Rp500.000) / 0,3% (>= Rp500.000), H+1, Rp2.000/pencairan' : '0,7%, hari yang sama';
 }
+
+/** 6-digit PIN rules: digits only, and not an easy-to-guess pattern. */
+export function checkPin(pin: string): Check {
+  if (!/^\d*$/.test(pin)) return { ok: false, message: 'PIN hanya berisi angka' };
+  if (pin.length !== 6) return { ok: false, message: `${pin.length} dari 6 angka` };
+  const d = pin.split('').map(Number);
+  const same = d.every((x) => x === d[0]);
+  const up = d.every((x, i) => i === 0 || x === (d[i - 1] + 1) % 10);
+  const down = d.every((x, i) => i === 0 || x === (d[i - 1] + 9) % 10);
+  const repeat = pin.slice(0, 3) === pin.slice(3) || pin.slice(0, 2).repeat(3) === pin;
+  if (same || up || down || repeat || pin === '112233') return { ok: false, message: 'PIN terlalu mudah ditebak. Hindari angka berurutan atau berulang.' };
+  return { ok: true, message: 'PIN aman' };
+}

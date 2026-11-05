@@ -2,7 +2,7 @@ import Logo from '@/components/Logo';
 import Link from 'next/link';
 import ForgotForm from './ForgotForm';
 
-export const metadata = { title: 'Lupa kata sandi · AIPOS' };
+export const metadata = { title: 'Lupa PIN · AIPOS' };
 
 export default function ForgotPage() {
   return (

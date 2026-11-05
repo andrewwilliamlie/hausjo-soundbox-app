@@ -8,7 +8,7 @@ export default function ResetLink({ id, phone }: { id: string; phone: string }) 
   const [state, action, pending] = useActionState<ResetLinkState, FormData>(sendMerchantReset, { error: null });
   const [copied, setCopied] = useState(false);
   const wa = state.link
-    ? `https://wa.me/62${phone.replace(/^0/, '')}?text=${encodeURIComponent(`Halo, ini link AIPOS untuk membuat kata sandi baru (berlaku ${state.hours} jam, sekali pakai):\n${state.link}`)}`
+    ? `https://wa.me/62${phone.replace(/^0/, '')}?text=${encodeURIComponent(`Halo, ini link AIPOS untuk membuat PIN baru (berlaku ${state.hours} jam, sekali pakai):\n${state.link}`)}`
     : '';
   return (
     <form action={action} className="card" style={{ gap: 10 }}>
@@ -16,8 +16,8 @@ export default function ResetLink({ id, phone }: { id: string; phone: string }) 
       <p className="hint" style={{ fontWeight: 700, letterSpacing: .6 }}>AKUN MERCHANT</p>
       {!state.link && (
         <div style={{ display: 'flex', flexWrap: 'wrap', gap: 10, alignItems: 'center' }}>
-          <button className="btn btn-ghost" disabled={pending}>{pending ? 'Membuat link…' : 'Kirim link atur ulang kata sandi'}</button>
-          <span className="hint">Untuk merchant yang lupa kata sandi. Link dikirim ke emailnya.</span>
+          <button className="btn btn-ghost" disabled={pending}>{pending ? 'Membuat link…' : 'Kirim link atur ulang PIN'}</button>
+          <span className="hint">Untuk merchant yang lupa PIN. Link dikirim ke emailnya.</span>
         </div>
       )}
       {state.error && <p className="err" role="alert">{state.error}</p>}

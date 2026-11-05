@@ -14,7 +14,7 @@ const sections: Section[] = [
   {
     h: 'Data yang kami kumpulkan',
     list: [
-      'Data akun: nomor WhatsApp, alamat email, kata sandi (disimpan dalam bentuk terenkripsi satu arah, tidak bisa dibaca siapa pun), dan kode referral bila ada.',
+      'Data akun: nomor WhatsApp, alamat email, PIN (disimpan dalam bentuk terenkripsi satu arah, tidak bisa dibaca siapa pun), dan kode referral bila ada.',
       'Data identitas pemilik usaha: foto e-KTP, selfie dengan e-KTP, nama lengkap, NIK, tempat dan tanggal lahir, jenis kelamin, serta alamat sesuai e-KTP.',
       'Data usaha: nama dan jenis usaha, alamat dan titik lokasi toko (bila Anda mengizinkan akses lokasi), foto depan toko dan foto produk, cara berjualan, link toko online, dan perkiraan omzet.',
       'Data pencairan: nama bank, nomor rekening, nama pemilik rekening, dan pilihan waktu pencairan.',

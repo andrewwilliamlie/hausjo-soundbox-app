@@ -84,11 +84,13 @@ export async function changeMerchantPassword(input: { current: string; next: str
   const user = await db.user.findUnique({ where: { id: uid } });
   if (!user) return { ok: false, error: 'Silakan masuk lagi' };
   const bcrypt = (await import('bcryptjs')).default;
-  if (!(await bcrypt.compare(input.current, user.passwordHash))) return { ok: false, error: 'Kata sandi saat ini salah' };
-  if (input.next.length < 8) return { ok: false, error: 'Kata sandi baru minimal 8 karakter' };
-  if (input.next !== input.again) return { ok: false, error: 'Ulangi kata sandi baru dengan sama persis' };
+  if (!(await bcrypt.compare(input.current, user.passwordHash))) return { ok: false, error: 'PIN (atau kata sandi lama) saat ini salah' };
+  const { checkPin } = await import('@/lib/rules');
+  const pc = checkPin(input.next);
+  if (!pc.ok) return { ok: false, error: pc.message };
+  if (input.next !== input.again) return { ok: false, error: 'Ulangi PIN baru dengan angka yang sama' };
   await db.user.update({ where: { id: uid }, data: { passwordHash: await bcrypt.hash(input.next, 12), passwordChangedAt: new Date(Date.now() - 2000) } });
   const { startMerchantSession } = await import('@/lib/session');
   await startMerchantSession(uid); // this phone stays signed in; other devices are signed out
-  return { ok: true, message: 'Kata sandi baru tersimpan' };
+  return { ok: true, message: 'PIN baru tersimpan' };
 }

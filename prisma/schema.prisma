@@ -71,6 +71,8 @@ model User {
   referralCode String?
   createdAt    DateTime      @default(now())
   passwordChangedAt DateTime? // sessions issued before this are rejected
+  failedLogins Int       @default(0) // wrong PIN attempts in a row
+  lockedUntil  DateTime? // login blocked until this time after too many wrong PINs
   applications Application[]
   passwordResets PasswordReset[]
 }

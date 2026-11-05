@@ -23,8 +23,8 @@ export async function createResetLink(userId: string, byAdminId?: string) {
   const link = `${APP()}/masuk/reset?t=${token}`;
   await sendMail(
     user.email,
-    'Atur ulang kata sandi AIPOS',
-    `Ada permintaan untuk mengatur ulang kata sandi akun AIPOS Anda (${user.phone}).\n\nBuat kata sandi baru lewat link ini (berlaku ${hours} jam, hanya sekali pakai):\n${link}\n\nJika Anda tidak memintanya, abaikan email ini. Kata sandi lama tetap berlaku.\n\nAIPOS`
+    'Atur ulang PIN AIPOS',
+    `Ada permintaan untuk mengatur ulang PIN akun AIPOS Anda (${user.phone}).\n\nBuat PIN baru lewat link ini (berlaku ${hours} jam, hanya sekali pakai):\n${link}\n\nJika Anda tidak memintanya, abaikan email ini. PIN lama tetap berlaku.\n\nAIPOS`
   );
   return { link, hours };
 }
