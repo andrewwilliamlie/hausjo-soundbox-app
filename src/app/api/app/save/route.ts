@@ -29,8 +29,8 @@ const fields = z
     province: z.string().trim().max(60),
     postalCode: z.string().trim().max(10),
     villageCode: z.string().trim().regex(/^(\d{2}\.\d{2}\.\d{2}\.\d{4})?$/),
-    lat: z.number().min(-12).max(7),
-    lng: z.number().min(94).max(142),
+    lat: z.number().min(-12).max(7).nullable(),
+    lng: z.number().min(94).max(142).nullable(),
     turnover: z.enum(['UMI', 'UKE', 'UME', 'UBE'])
   })
   .partial();

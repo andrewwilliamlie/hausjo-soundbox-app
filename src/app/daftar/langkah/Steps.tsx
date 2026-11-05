@@ -5,7 +5,7 @@ import Icon, { IconTile } from '@/components/Icon';
 import LiveSelfie from './LiveSelfie';
 import { Upload } from './Upload';
 import { BUSINESS_TYPES } from '@/lib/provinces';
-import RegionPicker from './RegionPicker';
+import RegionPicker, { matchRegion, type GeoAddress } from './RegionPicker';
 import { checkBusinessName, checkNik } from '@/lib/rules';
 
 type Data = {
@@ -47,7 +47,9 @@ export default function Steps({ initial, uploaded, product }: { initial: Data; u
   const [error, setError] = useState('');
   const [agree, setAgree] = useState(false);
   const [ticket, setTicket] = useState('');
-  const [locMsg, setLocMsg] = useState(initial.lat != null ? 'Lokasi toko tersimpan' : '');
+  const [locMsg, setLocMsg] = useState(initial.lat != null ? 'Lokasi toko tersimpan. Periksa alamat di bawah.' : '');
+  const [locMode, setLocMode] = useState<'' | 'gps' | 'manual'>(initial.lat != null ? 'gps' : initial.province ? 'manual' : '');
+  const [locBusy, setLocBusy] = useState(false);
 
   const set = <K extends keyof Data>(k: K, v: Data[K]) => {
     setD((p) => ({ ...p, [k]: v }));
@@ -61,7 +63,8 @@ export default function Steps({ initial, uploaded, product }: { initial: Data; u
     if (s === 1) return { ktpName: d.ktpName, nik: d.nik, birthPlace: d.birthPlace, birthDate: d.birthDate, gender: d.gender, ktpAddress: d.ktpAddress, ocrEdited };
     if (s === 2) {
       const { ktpName, nik: _n, birthPlace, birthDate, gender, ktpAddress, ocrConfidence, lat, lng, ...rest } = d;
-      return { ...rest, ...(lat != null && lng != null ? { lat, lng } : {}) };
+      // Manual address: the GPS point is cleared so the store pin is never somewhere else.
+      return { ...rest, lat: locMode === 'gps' ? lat : null, lng: locMode === 'gps' ? lng : null };
     }
     return undefined;
   }
@@ -76,6 +79,7 @@ export default function Steps({ initial, uploaded, product }: { initial: Data; u
     if (s === 2) {
       if (!d.businessType) return 'Pilih jenis usaha';
       if (!name.ok) return 'Periksa nama usaha: ' + name.message;
+      if (!locMode) return 'Pilih alamat toko: lokasi saya sekarang atau lokasi lain';
       if (!d.province || !d.city || !d.kecamatan || !d.villageCode) return 'Pilih provinsi, kota, kecamatan dan kelurahan/desa dari daftar';
       if (!/^\d{5}$/.test(d.postalCode)) return 'Kode pos harus 5 angka';
       if (!d.street.trim()) return 'Isi nama jalan toko';
@@ -109,14 +113,51 @@ export default function Steps({ initial, uploaded, product }: { initial: Data; u
     }
   }
 
-  function locate() {
-    if (!navigator.geolocation) return setLocMsg('Lokasi tidak tersedia di perangkat ini');
-    setLocMsg('Mencari lokasi…');
+  const blankAddress = { province: '', city: '', kecamatan: '', kelurahan: '', postalCode: '', villageCode: '', street: '', number: '', rt: '', rw: '' };
+
+  /** "Lokasi saya sekarang": GPS point → address via the server → matched to the region lists → fields filled in. */
+  function pickMyLocation() {
+    setLocMode('gps');
+    if (!navigator.geolocation) return setLocMsg('Lokasi tidak tersedia di perangkat ini. Pilih "Lokasi lain" dan isi manual.');
+    setLocBusy(true);
+    setLocMsg('Mencari lokasi Anda…');
     navigator.geolocation.getCurrentPosition(
-      (p) => { setD((x) => ({ ...x, lat: p.coords.latitude, lng: p.coords.longitude })); setLocMsg('Lokasi toko tersimpan'); },
-      () => setLocMsg('Izin lokasi ditolak. Isi alamat secara manual.'),
-      { enableHighAccuracy: true, timeout: 10000 }
+      async (p) => {
+        const { latitude: lat, longitude: lng, accuracy } = p.coords;
+        setD((x) => ({ ...x, lat, lng }));
+        setLocMsg('Membaca alamat…');
+        const weak = accuracy > 150 ? ` Akurasi GPS rendah (±${Math.round(accuracy)} m), periksa lagi.` : '';
+        try {
+          const res = await fetch('/api/geo/reverse', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ lat, lng }) });
+          const g = (await res.json()) as GeoAddress & { street?: string; number?: string; error?: string };
+          if (!res.ok) throw new Error(g.error || 'gagal');
+          const { region, levels } = await matchRegion(g);
+          setD((x) => ({ ...x, ...blankAddress, ...region, street: g.street ?? '', number: g.number ?? '', lat, lng }));
+          setLocMsg(levels >= 4
+            ? `Alamat terisi dari lokasi Anda. Periksa, lalu isi RT/RW.${weak}`
+            : `Sebagian alamat terisi. Lengkapi bagian yang kosong.${weak}`);
+        } catch {
+          setLocMsg(`Titik lokasi tersimpan, tapi alamat tidak bisa dibaca otomatis. Isi alamat di bawah.${weak}`);
+        } finally {
+          setLocBusy(false);
+        }
+      },
+      (err) => {
+        setLocBusy(false);
+        setLocMode('');
+        setLocMsg(err.code === err.PERMISSION_DENIED
+          ? 'Izin lokasi ditolak. Izinkan lokasi di browser, atau pilih "Lokasi lain".'
+          : 'Lokasi belum ditemukan. Coba lagi di luar ruangan, atau pilih "Lokasi lain".');
+      },
+      { enableHighAccuracy: true, timeout: 15000, maximumAge: 0 }
     );
+  }
+
+  /** "Lokasi lain": the store is somewhere else, so no GPS point and the merchant types the address. */
+  function pickOtherLocation() {
+    if (locMode === 'gps') setD((x) => ({ ...x, ...blankAddress, lat: null, lng: null }));
+    setLocMode('manual');
+    setLocMsg('');
   }
 
   const labels = ['Foto e-KTP & selfie', 'Data usaha', 'Konfirmasi'];
@@ -202,8 +243,21 @@ export default function Steps({ initial, uploaded, product }: { initial: Data; u
           </label>
 
           <h2 className="h2" style={{ fontSize: 15, marginTop: 6 }}>Alamat toko</h2>
-          <button type="button" className="btn btn-ghost" onClick={locate} style={{ gap: 8 }}><Icon name="pin" size={18} />Gunakan lokasi saya sekarang</button>
-          {locMsg && <span className={d.lat != null ? 'okmsg' : 'hint'}>{locMsg}</span>}
+          <div role="radiogroup" aria-label="Alamat toko" style={{ display: 'grid', gridTemplateColumns: 'repeat(2, minmax(0, 1fr))', gap: 10 }}>
+            {([['gps', 'pin', 'Lokasi saya sekarang', 'Saya sedang di toko · alamat terisi otomatis', pickMyLocation], ['manual', 'store', 'Lokasi lain', 'Toko di tempat lain · isi alamat manual', pickOtherLocation]] as const).map(([v, ic, t, sub, fn]) => (
+              <button key={v} type="button" role="radio" aria-checked={locMode === v} className="choice" onClick={fn} disabled={locBusy}>
+                <Icon name={ic} size={24} color={locMode === v ? 'var(--blue)' : 'var(--muted)'} />
+                <strong style={{ fontSize: 14 }}>{t}</strong><span className="hint">{sub}</span>
+              </button>
+            ))}
+          </div>
+          {locMsg && (
+            <span className={`fade-in ${locBusy ? 'hint' : locMode === 'gps' && d.lat != null ? 'okmsg' : 'hint'}`} role="status" style={{ display: 'flex', gap: 8, alignItems: 'center', flexWrap: 'wrap' }}>
+              {locBusy && <span className="spin" aria-hidden="true" />}{locMsg}
+              {!locBusy && locMode === 'gps' && d.lat != null && <a href={`https://maps.google.com/?q=${d.lat},${d.lng}`} target="_blank" rel="noreferrer" style={{ fontWeight: 700 }}>Lihat titik di peta</a>}
+            </span>
+          )}
+          {locMode !== '' && (<>
           <RegionPicker
             value={{ province: d.province, city: d.city, kecamatan: d.kecamatan, kelurahan: d.kelurahan, postalCode: d.postalCode, villageCode: d.villageCode }}
             onChange={(v) => setD((x) => ({ ...x, ...v }))}
@@ -214,6 +268,8 @@ export default function Steps({ initial, uploaded, product }: { initial: Data; u
             <label className="field">RT<input className="input" inputMode="numeric" value={d.rt} onChange={(e) => set('rt', e.target.value)} /></label>
             <label className="field">RW<input className="input" inputMode="numeric" value={d.rw} onChange={(e) => set('rw', e.target.value)} /></label>
           </div>
+          {locMode === 'gps' && !d.rt && <span className="hint">RT/RW tidak tercatat di peta, jadi isi sendiri.</span>}
+          </>)}
           <div style={{ display: 'grid', gridTemplateColumns: 'repeat(2, minmax(0, 1fr))', gap: 10 }}>
             <Upload kind="STORE_FRONT" label="Foto depan toko" icon="store" done={!!up.STORE_FRONT} onDone={() => setUp((u) => ({ ...u, STORE_FRONT: true }))} />
             <Upload kind="PRODUCT" label="Foto produk di toko" icon="box" done={!!up.PRODUCT} onDone={() => setUp((u) => ({ ...u, PRODUCT: true }))} />
