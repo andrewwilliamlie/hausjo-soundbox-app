@@ -1,6 +1,7 @@
 import { NextResponse } from 'next/server';
 import { db } from '@/lib/db';
 import { mails, sendMail } from '@/lib/mail';
+import { BUSINESS_CATEGORIES } from '@/lib/provinces';
 import { checkBusinessName, checkNik } from '@/lib/rules';
 import { merchantId } from '@/lib/auth';
 
@@ -28,7 +29,7 @@ export async function POST() {
   if (!app.street || !app.kelurahan || !app.kecamatan || !app.city || !app.province) missing.push('alamat toko lengkap');
   if (missing.length) return NextResponse.json({ error: 'Belum lengkap: ' + missing.join(', ') }, { status: 400 });
 
-  await db.application.update({ where: { id: app.id }, data: { status: 'SUBMITTED', submittedAt: new Date() } });
+  await db.application.update({ where: { id: app.id }, data: { status: 'SUBMITTED', submittedAt: new Date(), mcc: app.mcc ?? BUSINESS_CATEGORIES.find((c) => c.name === app.businessType)?.mcc ?? null } });
   const m = mails.submitted(app.ticket);
   await sendMail(app.user.email, m.subject, m.text);
   return NextResponse.json({ ok: true, ticket: app.ticket });

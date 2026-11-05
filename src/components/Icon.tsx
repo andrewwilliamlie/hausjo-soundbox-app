@@ -46,7 +46,19 @@ const PATHS: Record<string, React.ReactNode> = {
   arrowLeft: <path d="M19 12H5M11 6l-6 6 6 6" />,
   filter: <path d="M4 5h16l-6 7v6l-4 2v-8z" />,
   sort: <path d="M4 7h16M7 12h10M10 17h4" />,
-  chevronDown: <path d="M6 9l6 6 6-6" />
+  chevronDown: <path d="M6 9l6 6 6-6" />,
+  food: <><path d="M3 11h18a9 9 0 0 1-18 0z" /><path d="M7 21h10M8 7c0-1.5 1-1.5 1-3M12 7c0-1.5 1-1.5 1-3M16 7c0-1.5 1-1.5 1-3" /></>,
+  cart: <><path d="M3 4h2l2.4 11h10.2L20 8H6.2" /><circle cx="9" cy="19" r="1.6" /><circle cx="17" cy="19" r="1.6" /></>,
+  car: <><path d="M5 16V11l2-5h10l2 5v5M3 16h18v3H3zM5 11h14" /><circle cx="7.5" cy="13.5" r=".5" /><circle cx="16.5" cy="13.5" r=".5" /></>,
+  phone: <><rect x="7" y="2" width="10" height="20" rx="2" /><path d="M11 18h2" /></>,
+  shirt: <path d="M8 3l-5 3 2 5 3-1v11h8V10l3 1 2-5-5-3a4 4 0 0 1-8 0z" />,
+  scissors: <><circle cx="6" cy="7" r="3" /><circle cx="6" cy="17" r="3" /><path d="M8.5 8.5L20 19M8.5 15.5L20 5" /></>,
+  pill: <><rect x="3" y="8.5" width="18" height="7" rx="3.5" transform="rotate(-45 12 12)" /><path d="M9.5 9.5l5 5" /></>,
+  washer: <><rect x="4" y="2" width="16" height="20" rx="2" /><circle cx="12" cy="13" r="5" /><path d="M8 6h.01M11 6h.01M9.5 14a3 3 0 0 0 5 0" /></>,
+  hammer: <><path d="M14 4l6 6-3 3-6-6zM11 7l-8 8 3 3 8-8" /></>,
+  leaf: <><path d="M5 19c0-9 6-14 15-14 0 9-5 15-14 15" /><path d="M5 19l8-8" /></>,
+  tag: <><path d="M3 12V4h8l10 10-8 8z" /><circle cx="7.5" cy="8.5" r="1.5" /></>,
+  alert: <><path d="M12 3l10 18H2z" /><path d="M12 10v5M12 18h.01" /></>
 };
 
 export type IconName = keyof typeof PATHS;
@@ -64,8 +76,13 @@ export default function Icon({ name, size = 22, color = 'currentColor', label, s
 }
 
 /** Rounded tinted square holding an icon. */
-export function IconTile({ name, tone = 'blue', size = 44 }: { name: IconName; tone?: 'blue' | 'orange' | 'green' | 'navy'; size?: number }) {
-  const tones = { blue: ['#eaf2ff', '#1f5fd6'], orange: ['#fff4e5', '#b54708'], green: ['#ecfdf3', '#067647'], navy: ['#16336f', '#ffffff'] };
+export type Tone = 'blue' | 'orange' | 'green' | 'navy' | 'pink' | 'purple' | 'teal' | 'yellow' | 'red' | 'slate';
+export function IconTile({ name, tone = 'blue', size = 44 }: { name: IconName; tone?: Tone; size?: number }) {
+  const tones: Record<Tone, [string, string]> = {
+    blue: ['#e8f1ff', '#0069fc'], orange: ['#fff1e3', '#c4500a'], green: ['#e7f8ef', '#067647'], navy: ['#16336f', '#ffffff'],
+    pink: ['#fdebf3', '#c11574'], purple: ['#f1ecff', '#6927da'], teal: ['#e3f7f6', '#0e7c78'], yellow: ['#fff8db', '#9a6b00'],
+    red: ['#feeceb', '#c0281b'], slate: ['#eef1f6', '#475467']
+  };
   const [bg, fg] = tones[tone];
   return (
     <span aria-hidden="true" style={{ width: size, height: size, borderRadius: 12, background: bg, display: 'inline-flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>

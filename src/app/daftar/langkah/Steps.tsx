@@ -4,9 +4,12 @@ import { useState } from 'react';
 import Icon, { IconTile } from '@/components/Icon';
 import LiveSelfie from './LiveSelfie';
 import { Upload } from './Upload';
-import { BUSINESS_TYPES } from '@/lib/provinces';
+import BusinessTypePicker from './BusinessTypePicker';
+import { BUSINESS_CATEGORIES } from '@/lib/provinces';
 import RegionPicker, { matchRegion, type GeoAddress } from './RegionPicker';
 import { checkBusinessName, checkNik } from '@/lib/rules';
+
+const BUSINESS_NAMES: string[] = BUSINESS_CATEGORIES.map((c) => c.name);
 
 type Data = {
   ktpName: string; nik: string; birthPlace: string; birthDate: string; gender: string; ktpAddress: string;
@@ -78,6 +81,7 @@ export default function Steps({ initial, uploaded, product }: { initial: Data; u
     }
     if (s === 2) {
       if (!d.businessType) return 'Pilih jenis usaha';
+      if (!BUSINESS_NAMES.includes(d.businessType)) return 'Pilih ulang jenis usaha dari daftar kategori';
       if (!name.ok) return 'Periksa nama usaha: ' + name.message;
       if (!locMode) return 'Pilih alamat toko: lokasi saya sekarang atau lokasi lain';
       if (!d.province || !d.city || !d.kecamatan || !d.villageCode) return 'Pilih provinsi, kota, kecamatan dan kelurahan/desa dari daftar';
@@ -233,10 +237,7 @@ export default function Steps({ initial, uploaded, product }: { initial: Data; u
             <label style={{ display: 'flex', gap: 10, alignItems: 'center', fontSize: 14, minHeight: 40 }}><input type="checkbox" checked={d.sellsOnline} onChange={(e) => set('sellsOnline', e.target.checked)} style={{ width: 20, height: 20 }} />Online, marketplace atau medsos</label>
             {d.sellsOnline && <label className="field">Link toko online<input className="input" value={d.onlineLink} onChange={(e) => set('onlineLink', e.target.value)} placeholder="shopee.co.id/tokoanda atau Instagram" /></label>}
           </fieldset>
-          <label className="field">Jenis usaha
-            <input className="input" list="jenis-usaha" value={d.businessType} onChange={(e) => set('businessType', e.target.value)} placeholder="Cari: warung, laundry, pulsa…" />
-            <datalist id="jenis-usaha">{BUSINESS_TYPES.map((t) => <option key={t} value={t} />)}</datalist>
-          </label>
+          <BusinessTypePicker value={d.businessType} onChange={(v) => set('businessType', v)} />
           <label className="field">Nama usaha
             <input className={!name.ok && d.businessName ? 'input bad' : 'input'} value={d.businessName} onChange={(e) => set('businessName', e.target.value)} placeholder="Contoh: WARUNG MAKAN RINA" />
             <span style={{ display: 'flex', justifyContent: 'space-between', gap: 8 }}><span className={name.ok ? 'okmsg' : d.businessName ? 'err' : 'hint'}>{name.message}</span><span className="hint">{d.businessName.trim().length}/25</span></span>

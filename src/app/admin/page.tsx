@@ -22,7 +22,7 @@ const STATUS: Record<string, [string, string, string]> = {
 const DOC_LABEL: Record<string, string> = { KTP: 'Foto e-KTP', SELFIE: 'Selfie + e-KTP', STORE_FRONT: 'Depan toko', PRODUCT: 'Produk di toko' };
 const SB_LABEL: Record<string, string> = { NONE: 'QRIS saja', BUY: 'Beli di aplikasi', MARKETPLACE: 'Marketplace', SALES: 'Sales lapangan', ARRIVED: 'Sudah sampai' };
 const REASONS = ['Foto buram', 'Wajah tidak sama dengan KTP', 'Nama toko tidak terlihat', 'Dokumen terpotong', 'Bukan dokumen asli'];
-const MCC = ['5812 - Restoran dan Tempat Makan', '5411 - Toko Kelontong / Supermarket', '5814 - Makanan Cepat Saji', '4814 - Pulsa & Telekomunikasi', '7210 - Laundry', '5499 - Toko Makanan Lainnya', '5699 - Pakaian & Aksesoris', '7230 - Salon & Barbershop', '7538 - Bengkel', '5999 - Toko Ritel Lainnya'];
+const MCC = ['5812 - Restoran dan Tempat Makan', '5411 - Toko Kelontong / Supermarket', '5814 - Makanan Cepat Saji', '4814 - Pulsa & Telekomunikasi', '7210 - Laundry', '5499 - Toko Makanan Lainnya', '5699 - Pakaian & Aksesoris', '7230 - Salon & Barbershop', '7538 - Bengkel', '5912 - Apotek & Toko Obat', '5211 - Bahan Bangunan', '5999 - Toko Ritel Lainnya'];
 
 function pill(status: string) {
   const [label, bg, fg] = STATUS[status] ?? [status, '#eee', '#333'];
