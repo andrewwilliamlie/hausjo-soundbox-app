@@ -27,6 +27,7 @@ export async function sendMail(to: string, subject: string, text: string, attach
   }
   try {
     await t.sendMail({ from: process.env.MAIL_FROM || process.env.SMTP_USER, to, subject, text, attachments });
+    console.log(`[mail] sent "${subject}" to ***@${to.split('@')[1] ?? '?'}`);
   } catch (e) {
     console.error('[mail] send failed', e);
   }
