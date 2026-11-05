@@ -192,7 +192,7 @@ button, input, select, textarea { font: inherit; }
 
 .app-sheet { background: #fff; border-radius: 26px 26px 0 0; margin-top: -28px; position: relative; padding: 20px 16px 24px; display: flex; flex-direction: column; gap: 20px; flex: 1; }
 .app-sheet.inner { margin-top: -18px; background: var(--ground); }
-.search-pill { flex: 1; display: flex; align-items: center; gap: 8px; border: 1px solid var(--line-2); border-radius: 999px; padding: 0 14px; min-height: 46px; background: #fff; }
+.search-pill { flex: 1; display: flex; align-items: center; gap: 8px; border: 1px solid var(--line-2); border-radius: 999px; padding: 0 14px; min-height: 46px; max-height: 48px; background: #fff; }
 .search-pill input { border: 0; outline: 0; font-size: 14.5px; flex: 1; min-width: 0; background: none; color: var(--ink); }
 .search-pill:focus-within { border-color: var(--blue); box-shadow: 0 0 0 2px rgba(31,95,214,.15); }
 .pill-btn { display: inline-flex; align-items: center; gap: 6px; border: 1px solid var(--line-2); border-radius: 999px; padding: 0 14px; min-height: 46px; background: #fff; color: var(--ink); font-size: 14px; font-weight: 600; cursor: pointer; white-space: nowrap; }
