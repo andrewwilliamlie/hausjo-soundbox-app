@@ -56,7 +56,7 @@ export default function HomeClient({ app, isNew, outletCount }: { app: AppView; 
   const features: Feature[] = [
     { icon: 'speaker', label: 'Soundbox', action: () => { setSbWay(active && app.product === 'SOUNDBOX' ? 'arrived' : 'buy'); setSheet('sb'); } },
     { icon: 'store', label: 'Toko saya', href: '/app/toko' },
-    { icon: 'printer', label: 'Pesan stiker', href: waLink(`Halo AIPOS, saya mau pesan stiker QRIS cetak untuk ${app.businessName} (${app.ticket}).`), external: true },
+    { icon: 'printer', label: 'Pesan stiker', href: '/app/stiker' },
     { icon: 'edc', label: 'Beli EDC', href: 'https://hausjo.id/produk', external: true },
     { icon: 'gift', label: 'Referral', action: soon, soon: true },
     { icon: 'sort', label: 'Laporan', action: soon, soon: true },

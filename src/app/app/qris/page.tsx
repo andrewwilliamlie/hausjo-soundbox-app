@@ -1,7 +1,6 @@
 import Link from 'next/link';
 import Icon from '@/components/Icon';
 import { loadMerchantView } from '@/lib/merchant-view';
-import { waLink } from '@/lib/contact';
 import PageTop from '../PageTop';
 
 export const metadata = { title: 'QRIS · AIPOS' };
@@ -22,7 +21,7 @@ export default async function QrisPage() {
               ? <img src={`/api/files/${app.stickerId}`} alt={`QRIS ${app.businessName}`} style={{ width: '100%', maxWidth: 320, borderRadius: 12, border: '1px solid var(--line)' }} />
               : <div className="empty-card" style={{ width: '100%' }}><Icon name="file" size={28} color="var(--blue)" /><span>Stiker QRIS berbentuk PDF</span></div>}
             <a className="btn btn-primary btn-block" href={`/api/files/${app.stickerId}?download=1`} style={{ gap: 8 }}><Icon name="download" size={18} />Unduh &amp; cetak stiker</a>
-            <a className="btn btn-ghost btn-block" href={waLink(`Halo AIPOS, saya mau pesan stiker QRIS cetak untuk ${app.businessName} (${app.ticket}).`)} target="_blank" rel="noreferrer" style={{ gap: 8 }}><Icon name="printer" size={18} />Pesan stiker cetak</a>
+            <Link className="btn btn-ghost btn-block" href="/app/stiker" style={{ gap: 8 }}><Icon name="printer" size={18} />Pesan stiker cetak / stand akrilik</Link>
           </section>
         ) : (
           <div className="empty-card rise">

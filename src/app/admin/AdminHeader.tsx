@@ -5,6 +5,7 @@ import { adminLogout } from './actions';
 
 const TABS: Array<[string, string, string, boolean]> = [
   ['antrean', 'Antrean', '/admin', false],
+  ['stiker', 'Pesanan stiker', '/admin/stiker', false],
   ['tim', 'Tim', '/admin/tim', true],
   ['cadangan', 'Cadangan', '/admin/cadangan', true],
   ['akun', 'Akun saya', '/admin/akun', false]
@@ -18,7 +19,7 @@ export default function AdminHeader({ admin, tab }: { admin: Admin; tab: string 
         <strong style={{ display: 'inline-flex', alignItems: 'center', gap: 10 }}><Logo white height={20} /><span style={{ fontWeight: 500, fontSize: 13, color: '#bfd4ff' }}>Admin</span></strong>
         {!admin.mustChangePassword && (
           <nav aria-label="Menu admin" style={{ display: 'flex', gap: 4, flexWrap: 'wrap' }}>
-            {TABS.filter(([, , , adminOnly]) => !adminOnly || admin.role === 'ADMIN').map(([k, label, href]) => (
+            {TABS.filter(([k, , , adminOnly]) => (!adminOnly || admin.role === 'ADMIN') && (k !== 'stiker' || admin.role !== 'REVIEWER')).map(([k, label, href]) => (
               <Link key={k} href={href} aria-current={tab === k ? 'page' : undefined}
                 style={{ color: '#fff', textDecoration: 'none', fontSize: 13.5, fontWeight: 600, padding: '8px 12px', borderRadius: 8, background: tab === k ? 'rgba(255,255,255,.14)' : 'transparent' }}>
                 {label}

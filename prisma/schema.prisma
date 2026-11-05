@@ -78,6 +78,8 @@ model User {
   invoices       Invoice[]
   products       InvoiceProduct[]
   invoiceCode    String?   // short code in invoice numbers, e.g. INV-WMR-261105-001
+  stickerOrders  StickerOrder[]
+  shipAddresses  ShipAddress[]
 }
 
 // One-time link to set a new merchant password (only the SHA-256 of the token is stored)
@@ -269,4 +271,75 @@ model InvoiceProduct {
   updatedAt DateTime @updatedAt
 
   @@index([userId, name])
+}
+
+
+enum StickerStatus {
+  UNPAID     // order placed, waiting for payment
+  PAID       // payment received
+  PRINTING   // being printed / assembled
+  SHIPPED    // handed to the courier (trackingNo)
+  DONE       // received
+  CANCELLED
+}
+
+// Printed QRIS sticker / acrylic stand orders ("Pesan stiker"). One order is for one store's QRIS.
+model StickerOrder {
+  id            String        @id @default(cuid())
+  number        String        @unique // STK-YYMMDD-XXXX
+  userId        String
+  user          User          @relation(fields: [userId], references: [id], onDelete: Cascade)
+  applicationId String        // the store whose QRIS is printed
+  items         Json          // [{ code, name, qty, price, normalPrice }]
+  // Delivery address, copied at order time so later address edits don't change the order
+  label         String
+  recipient     String
+  phone         String
+  address       String
+  kelurahan     String
+  kecamatan     String
+  city          String
+  province      String
+  postalCode    String
+  courierNote   String?
+  timeSlot      String?       // e.g. "12.00-17.00"
+  subtotal      Int
+  normalTotal   Int           // before the promo price, for "Penghematan"
+  shippingFee   Int
+  total         Int
+  status        StickerStatus @default(UNPAID)
+  payMethod     String?
+  paidAt        DateTime?
+  courier       String?
+  trackingNo    String?
+  shippedAt     DateTime?
+  adminNote     String?
+  history       Json          // [{ s: status, at: ISO time, by?: admin name }]
+  createdAt     DateTime      @default(now())
+  updatedAt     DateTime      @updatedAt
+
+  @@index([userId, createdAt])
+  @@index([status, createdAt])
+}
+
+// Saved delivery addresses for sticker orders ("Pilih alamat").
+model ShipAddress {
+  id          String   @id @default(cuid())
+  userId      String
+  user        User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  label       String   // Rumah, Toko, Kantor, ...
+  recipient   String
+  phone       String
+  address     String   // street, building, number
+  kelurahan   String
+  kecamatan   String
+  city        String
+  province    String
+  postalCode  String
+  villageCode String?
+  courierNote String?
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  @@index([userId])
 }
