@@ -54,7 +54,7 @@ const SLIDES: Slide[] = [
   },
   {
     title: 'Semua transaksi, satu aplikasi',
-    body: 'Pantau QRIS dan kartu dari semua tokomu secara real time. Laporan siap diunduh kapan saja.',
+    body: 'Kelola QRIS, EDC, Soundbox, dan semua tokomu dari satu aplikasi. Riwayat transaksi dan laporan segera hadir.',
     art: (
       <>
         <img src="/onboarding/soundbox-stand.jpg" alt="Soundbox AIPOS" className="intro-photo" style={{ position: 'absolute', right: '6%', top: '6%', width: '40%', aspectRatio: '150 / 250', objectPosition: '50% 30%' }} />

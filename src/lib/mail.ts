@@ -35,11 +35,12 @@ export async function sendMail(to: string, subject: string, text: string, attach
 
 const APP = () => process.env.APP_URL || 'https://app.aipos.co.id';
 
-type ShopKind = 'STIKER' | 'EDC' | 'SOUNDBOX';
+type ShopKind = 'STIKER' | 'EDC' | 'SOUNDBOX' | 'KERTAS';
 const SHOP: Record<ShopKind, { name: string; long: string; after: string; path: string }> = {
   STIKER: { name: 'stiker', long: 'stiker QRIS', after: 'Stiker dicetak', path: 'stiker' },
   EDC: { name: 'EDC', long: 'EDC', after: 'EDC disiapkan', path: 'edc' },
-  SOUNDBOX: { name: 'Soundbox', long: 'Soundbox QRIS', after: 'Soundbox disiapkan', path: 'soundbox' }
+  SOUNDBOX: { name: 'Soundbox', long: 'Soundbox QRIS', after: 'Soundbox disiapkan', path: 'soundbox' },
+  KERTAS: { name: 'kertas struk', long: 'kertas struk', after: 'Kertas struk disiapkan', path: 'kertas' }
 };
 
 export const mails = {

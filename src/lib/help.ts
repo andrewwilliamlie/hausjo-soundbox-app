@@ -38,7 +38,8 @@ export const TOPICS: HelpTopic[] = [
       'Tarik ujung kertas keluar sedikit, lalu tutup penutup printer sampai berbunyi klik.',
       'Cetak ulang struk terakhir dari menu aplikasi EDC untuk mencoba.'
     ],
-    note: 'Gunakan kertas thermal ukuran 58 mm (sering ditulis 57 mm). Simpan kertas di tempat kering dan tidak panas. Butuh kertas struk? Pilih "Minta CS menelepon saya" di bawah.'
+    note: 'Gunakan kertas thermal ukuran 58 mm (sering ditulis 57 mm). Simpan kertas di tempat kering dan tidak panas.',
+    action: { label: 'Beli kertas struk · Rp20.000 isi 10', href: '/app/kertas' }
   },
   {
     id: 'layar', cat: 'hardware', title: 'Layar tidak merespons atau EDC hang', summary: 'Aplikasi macet atau layar kotor.',

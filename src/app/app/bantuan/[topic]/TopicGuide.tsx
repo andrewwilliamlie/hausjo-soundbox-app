@@ -3,7 +3,7 @@
 import Link from 'next/link';
 import { useState, useTransition } from 'react';
 import Icon from '@/components/Icon';
-import { CS_WHATSAPP, waLink } from '@/lib/contact';
+import { CS_HOURS, CS_WHATSAPP, waLink } from '@/lib/contact';
 import { CALL_TIMES, type HelpTopic } from '@/lib/help';
 import { requestCall } from '../actions';
 
@@ -73,6 +73,7 @@ export default function TopicGuide({ topic, phone, store }: { topic: HelpTopic; 
         <section className={`card${answer === 'no' && !topic.request ? ' pop' : ''}`} style={{ gap: 12 }}>
           <strong style={{ fontSize: 15 }}>{topic.request && topic.action ? 'Butuh dibantu CS?' : 'Hubungi CS AIPOS'}</strong>
           <span className="hint">CS memandu Anda langkah demi langkah lewat telepon. Pilih telepon sekarang, atau minta CS menelepon Anda.</span>
+          <span className="note" style={{ display: 'flex', gap: 8, alignItems: 'center' }}><Icon name="clock" size={18} color="var(--blue)" />Jam operasional CS: {CS_HOURS}</span>
           <a className="btn btn-primary btn-block" href={`tel:+${CS_WHATSAPP}`} style={{ gap: 8 }}><Icon name="call" size={18} />Telepon CS sekarang</a>
           <div style={{ display: 'flex', flexDirection: 'column', gap: 10, borderTop: '1px solid var(--line)', paddingTop: 12 }}>
             <strong style={{ fontSize: 14 }}>Minta CS menelepon saya</strong>
@@ -98,7 +99,7 @@ export default function TopicGuide({ topic, phone, store }: { topic: HelpTopic; 
         <section className="card pop" style={{ gap: 6, alignItems: 'center', textAlign: 'center' }}>
           <Icon name="checkCircle" size={36} color="var(--ok)" />
           <strong style={{ fontSize: 15 }}>Permintaan terkirim · {sent}</strong>
-          <span className="hint">CS AIPOS akan menelepon {form.phone} ({form.callTime.toLowerCase()}) di jam kerja. Pastikan HP Anda aktif.</span>
+          <span className="hint">CS AIPOS akan menelepon {form.phone} ({form.callTime.toLowerCase()}) pada jam operasional: {CS_HOURS}. Pastikan HP Anda aktif.</span>
           <Link href="/app/bantuan" className="hint">Kembali ke Bantuan</Link>
         </section>
       )}

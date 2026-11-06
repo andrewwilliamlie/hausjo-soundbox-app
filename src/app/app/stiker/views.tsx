@@ -2,7 +2,7 @@ import Link from 'next/link';
 import { notFound, redirect } from 'next/navigation';
 import Icon from '@/components/Icon';
 import { ProductThumb, ShopHero } from '@/components/StickerArt';
-import { waLink } from '@/lib/contact';
+import { CS_HOURS, waLink } from '@/lib/contact';
 import { db } from '@/lib/db';
 import { FLOW, KIND_NAME, KIND_PATH, STATUS_TONE, asKind, feeText, itemsText, rp, statusLabel, type Kind, type OrderItem, type StickerStatus } from '@/lib/sticker';
 import PageTop from '../PageTop';
@@ -22,6 +22,10 @@ const COPY: Record<Kind, { title: string; sub: string; cta: string; intro: (stor
   SOUNDBOX: {
     title: 'Beli Soundbox', sub: 'Soundbox QRIS', cta: 'Beli sekarang',
     intro: (s) => `Soundbox QRIS untuk ${s}`, empty: 'Belum ada pesanan Soundbox.'
+  },
+  KERTAS: {
+    title: 'Kertas struk', sub: 'Kertas thermal 58 mm', cta: 'Beli sekarang',
+    intro: (s) => `Kertas struk untuk ${s}`, empty: 'Belum ada pesanan kertas struk.'
   }
 };
 
@@ -53,7 +57,8 @@ export async function OrdersList({ kind }: { kind: Kind }) {
               <>
                 {kind === 'STIKER' && <span className="hint">Pilih stiker saja atau stiker dengan stand akrilik. Dikirim ke alamat Anda.</span>}
                 {kind === 'SOUNDBOX' && <span className="hint">Menyebut nominal setiap pembayaran QRIS. {rp(349000)} sekali bayar, tanpa sewa.</span>}
-                <Link href={`${KIND_PATH[kind]}/pesan`} className="btn btn-primary btn-block" style={{ gap: 8 }}><Icon name={kind === 'EDC' ? 'edc' : kind === 'SOUNDBOX' ? 'speaker' : 'printer'} size={18} />{C.cta}</Link>
+                {kind === 'KERTAS' && <span className="hint">{rp(20000)} per pak isi 10 gulung kertas thermal 58 mm.</span>}
+                <Link href={`${KIND_PATH[kind]}/pesan`} className="btn btn-primary btn-block" style={{ gap: 8 }}><Icon name={kind === 'EDC' ? 'edc' : kind === 'SOUNDBOX' ? 'speaker' : kind === 'KERTAS' ? 'file' : 'printer'} size={18} />{C.cta}</Link>
               </>
             ) : (
               <>
@@ -66,6 +71,13 @@ export async function OrdersList({ kind }: { kind: Kind }) {
           </div>
         </section>
 
+        {kind === 'EDC' && (
+          <Link href="/app/kertas" className="card" style={{ flexDirection: 'row', gap: 12, alignItems: 'center', textDecoration: 'none', color: 'var(--ink)' }}>
+            <ProductThumb code="KERTAS10" size={40} />
+            <span style={{ flex: 1, display: 'flex', flexDirection: 'column', gap: 2 }}><strong style={{ fontSize: 14 }}>Kertas struk</strong><span className="hint">{rp(20000)} per pak isi 10 gulung</span></span>
+            <Icon name="chevron" size={18} color="var(--muted)" />
+          </Link>
+        )}
         <h2 className="h2" style={{ fontSize: 16, margin: '6px 0 0' }}>Pesanan saya</h2>
         {orders.length === 0 && <div className="empty-card"><Icon name="box" size={28} color="var(--blue)" /><span>{C.empty}</span></div>}
         {orders.map((o) => {
@@ -133,7 +145,7 @@ export async function OrderDetail({ kind, id, baru }: { kind: Kind; id: string; 
           <section className="card pop" style={{ gap: 6, alignItems: 'center', textAlign: 'center' }}>
             <Icon name="checkCircle" size={40} color="var(--ok)" />
             <strong style={{ fontSize: 17 }}>Pesanan dibuat</strong>
-            <span className="hint">Tim AIPOS mengirim link pembayaran ke WhatsApp {user.phone} di jam kerja.</span>
+            <span className="hint">Tim AIPOS mengirim link pembayaran ke WhatsApp {user.phone} pada jam operasional CS ({CS_HOURS}).</span>
           </section>
         )}
 
@@ -162,7 +174,7 @@ export async function OrderDetail({ kind, id, baru }: { kind: Kind; id: string; 
             </>
           )}
           {s === 'SHIPPED' && o.trackingNo && <span className="note">Nomor resi <b>{o.trackingNo}</b>{o.courier ? ` (${o.courier})` : ''}. Lacak di situs kurir.</span>}
-          {kind !== 'STIKER' && s === 'DONE' && <span className="note">Butuh bantuan aktivasi {what}? <a href={waLink(`Halo AIPOS, ${what} pesanan ${o.number} sudah sampai, saya mau aktivasi.`)} target="_blank" rel="noreferrer">Hubungi CS</a>.</span>}
+          {(kind === 'EDC' || kind === 'SOUNDBOX') && s === 'DONE' && <span className="note">Butuh bantuan aktivasi {what}? <a href={waLink(`Halo AIPOS, ${what} pesanan ${o.number} sudah sampai, saya mau aktivasi.`)} target="_blank" rel="noreferrer">Hubungi CS</a>.</span>}
         </section>
 
         <section className="card" style={{ gap: 4 }}>
@@ -187,6 +199,7 @@ export async function OrderDetail({ kind, id, baru }: { kind: Kind; id: string; 
           {o.courierNote && <span className="hint">Catatan: {o.courierNote}</span>}
         </section>
 
+        <span className="hint" style={{ textAlign: 'center' }}>CS AIPOS: {CS_HOURS}</span>
         <a className="btn btn-ghost btn-block" href={waLink(`Halo AIPOS, saya mau tanya pesanan ${what} ${o.number}.`)} target="_blank" rel="noreferrer" style={{ gap: 8 }}><Icon name="help" size={18} />Tanya CS</a>
       </main>
     </>

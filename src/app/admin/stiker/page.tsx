@@ -12,12 +12,12 @@ const FILTERS: Array<[string, string]> = [['open', 'Perlu diproses'], ['UNPAID',
 const STATUSES = Object.keys(STATUS_LABEL) as StickerStatus[];
 const when = (d: Date) => d.toLocaleString('id-ID', { timeZone: 'Asia/Jakarta', dateStyle: 'medium', timeStyle: 'short' });
 
-const KINDS: Array<[string, string]> = [['all', 'Semua produk'], ['STIKER', 'Stiker'], ['EDC', 'EDC'], ['SOUNDBOX', 'Soundbox']];
+const KINDS: Array<[string, string]> = [['all', 'Semua produk'], ['STIKER', 'Stiker'], ['EDC', 'EDC'], ['SOUNDBOX', 'Soundbox'], ['KERTAS', 'Kertas struk']];
 
 export default async function StickerOrdersAdmin({ searchParams }: { searchParams: Promise<{ f?: string; k?: string }> }) {
   const admin = await requireAdmin(['ACTIVATION']);
   const { f = 'open', k = 'all' } = await searchParams;
-  const kindWhere = k === 'STIKER' || k === 'EDC' || k === 'SOUNDBOX' ? { kind: k } : {};
+  const kindWhere = ['STIKER', 'EDC', 'SOUNDBOX', 'KERTAS'].includes(k) ? { kind: k } : {};
   const where = { ...kindWhere, ...(f === 'all' ? {} : f === 'open' ? { status: { in: ['UNPAID', 'PAID', 'PRINTING'] as StickerStatus[] } } : { status: f as StickerStatus }) };
   const orders = await db.stickerOrder.findMany({ where, orderBy: { createdAt: 'desc' }, take: 200, include: { user: { select: { email: true } } } });
   const stores = await db.application.findMany({
@@ -35,7 +35,7 @@ export default async function StickerOrdersAdmin({ searchParams }: { searchParam
       <AdminHeader admin={admin} tab="stiker" />
       <div className="admin-wrap" style={{ maxWidth: 1000 }}>
         <div>
-          <h1 style={{ margin: 0, fontSize: 22, fontWeight: 800 }}>Pesanan stiker, EDC &amp; Soundbox</h1>
+          <h1 style={{ margin: 0, fontSize: 22, fontWeight: 800 }}>Pesanan stiker, EDC, Soundbox &amp; kertas struk</h1>
           <p className="hint" style={{ marginTop: 4 }}>Alur: kirim link pembayaran ke WhatsApp merchant → tandai Sudah bayar → stiker: unduh QRIS toko lalu cetak; EDC/Soundbox: siapkan perangkat dan catat SN → Dikirim dengan nomor resi. Merchant menerima email tiap status berubah.</p>
         </div>
         <nav style={{ display: 'flex', gap: 8, flexWrap: 'wrap' }} aria-label="Filter produk">
@@ -100,7 +100,7 @@ export default async function StickerOrdersAdmin({ searchParams }: { searchParam
                 <label className="field">Nomor resi
                   <input name="trackingNo" className="input" defaultValue={o.trackingNo ?? ''} />
                 </label>
-                <label className="field" style={{ gridColumn: '1 / -1' }}>{kind === 'STIKER' ? 'Catatan internal' : 'Catatan internal (mis. SN perangkat)'}
+                <label className="field" style={{ gridColumn: '1 / -1' }}>{kind === 'EDC' || kind === 'SOUNDBOX' ? 'Catatan internal (mis. SN perangkat)' : 'Catatan internal'}
                   <input name="adminNote" className="input" defaultValue={o.adminNote ?? ''} />
                 </label>
                 <button className="btn btn-primary">Simpan</button>

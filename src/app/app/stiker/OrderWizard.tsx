@@ -30,6 +30,12 @@ const TEXT: Record<Kind, { title: string; pick: string; unit: string; note: stri
     note: 'Soundbox disambungkan ke QRIS toko ini. Untuk toko lain, ganti toko dulu di menu Toko saya.',
     what: 'Soundbox menyebut nominal setiap pembayaran QRIS yang masuk, jadi Anda tidak perlu cek HP. Sekali bayar, jadi milik Anda, tanpa sewa. CS AIPOS memandu aktivasi setelah Soundbox sampai.',
     after: 'Soundbox disiapkan setelah pembayaran diterima, lalu dikirim ke alamat Anda.'
+  },
+  KERTAS: {
+    title: 'Beli kertas struk', pick: 'Pilih jumlah pak', unit: 'pak',
+    note: 'Kertas struk dikirim ke alamat yang Anda pilih.',
+    what: 'Kertas thermal 58 mm untuk EDC yang punya printer, 10 gulung per pak.',
+    after: 'Kertas struk disiapkan setelah pembayaran diterima, lalu dikirim ke alamat Anda.'
   }
 };
 
@@ -136,7 +142,7 @@ export default function OrderWizard({ kind, store, saved, blank }: { kind: Kind;
             </section>
             <section className="card" style={{ gap: 8 }}>
               <strong style={{ fontSize: 14 }}>Yang Anda terima</strong>
-              <span className="hint">{T.what} Ongkos kirim: {feeText(SHIPPING_FEE[kind])}{SHIPPING_FEE[kind] ? ' per pesanan' : ''}.</span>
+              <span className="hint">{T.what} Ongkos kirim: {feeText(SHIPPING_FEE[kind])}{SHIPPING_FEE[kind] ? ' per pesanan ke seluruh Indonesia' : ''}.</span>
             </section>
           </div>
         )}

@@ -63,7 +63,9 @@ export default function HomeClient({ app, isNew, outletCount }: { app: AppView; 
     { icon: 'grid', label: 'Lainnya', href: '/app/akun' }
   ];
   const q = query.trim().toLowerCase();
-  const shown = q ? [...quick, ...features].filter((f) => f.label.toLowerCase().includes(q)) : features;
+  // Found by search only, to keep the grid at 8 tiles.
+  const hidden: Feature[] = [{ icon: 'file', label: 'Kertas struk', href: '/app/kertas' }, { icon: 'speaker', label: 'Beli Soundbox', href: '/app/soundbox' }];
+  const shown = q ? [...quick, ...features, ...hidden].filter((f) => f.label.toLowerCase().includes(q)) : features;
 
   const tile = (f: Feature, cls: string) => {
     const inner = (

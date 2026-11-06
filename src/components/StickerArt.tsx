@@ -116,6 +116,7 @@ export function ProductThumb({ code, size = 48 }: { code: string; size?: number 
   if (code === 'A920PRO') return <EdcLargeThumb size={size} />;
   if (code === 'AKRILIK') return <AcrylicThumb size={size} />;
   if (code === 'SOUNDBOX') return <SoundboxThumb size={size} />;
+  if (code === 'KERTAS10') return <PaperThumb size={size} />;
   return <StickerThumb size={size} />;
 }
 
@@ -197,6 +198,44 @@ export function SoundboxHero() {
 }
 
 /** Banner for a shop kind. */
-export function ShopHero({ kind }: { kind: 'STIKER' | 'EDC' | 'SOUNDBOX' }) {
-  return kind === 'EDC' ? <EdcHero /> : kind === 'SOUNDBOX' ? <SoundboxHero /> : <StickerHero />;
+export function ShopHero({ kind }: { kind: 'STIKER' | 'EDC' | 'SOUNDBOX' | 'KERTAS' }) {
+  return kind === 'EDC' ? <EdcHero /> : kind === 'SOUNDBOX' ? <SoundboxHero /> : kind === 'KERTAS' ? <PaperHero /> : <StickerHero />;
+}
+
+/** A thermal paper roll with a receipt coming off it. */
+export function PaperThumb({ size = 48 }: { size?: number }) {
+  return (
+    <svg width={size} height={size} viewBox="0 0 48 48" aria-hidden="true">
+      <path d="M16 20h20v24l-3-2-3 2-3-2-3 2-3-2-3 2-2-1.4z" fill="#fff" stroke="#8db4ff" strokeWidth="1.5" strokeLinejoin="round" />
+      <path d="M20 26h12M20 31h9M20 36h11" stroke="#0b2253" strokeWidth="1.6" strokeLinecap="round" />
+      <ellipse cx="26" cy="13" rx="14" ry="9" fill="#e9f1ff" stroke="#0069fc" strokeWidth="2" />
+      <ellipse cx="26" cy="13" rx="5" ry="3.2" fill="#0069fc" />
+    </svg>
+  );
+}
+
+/** Top banner for "Kertas struk": stacked rolls and a receipt. */
+export function PaperHero() {
+  return (
+    <svg viewBox="0 0 360 170" width="100%" style={{ display: 'block' }} role="img" aria-label="Kertas struk thermal">
+      <defs>
+        <linearGradient id="krt-bg" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stopColor="#0069fc" /><stop offset="1" stopColor="#3a8bff" /></linearGradient>
+      </defs>
+      <rect width="360" height="170" fill="url(#krt-bg)" />
+      <circle cx="320" cy="150" r="80" fill="#fff" opacity=".07" />
+      <rect y="140" width="360" height="30" fill="#0a2a6e" opacity=".35" />
+      {[[70, 96], [126, 96], [182, 96], [98, 50], [154, 50]].map(([x, y], i) => (
+        <g key={i} transform={`translate(${x} ${y})`}>
+          <ellipse cx="26" cy="22" rx="26" ry="22" fill="#fff" />
+          <ellipse cx="26" cy="22" rx="18" ry="15" fill="#f2f6fc" />
+          <ellipse cx="26" cy="22" rx="8" ry="7" fill="#0b2253" />
+        </g>
+      ))}
+      <g transform="translate(250 30) rotate(6)">
+        <path d="M0 0h70v104l-6-4-6 4-6-4-6 4-6-4-6 4-6-4-6 4-6-4-6 4-5-4z" fill="#fff" />
+        <path d="M10 16h50M10 28h36M10 40h44M10 52h30M10 70h50" stroke="#0b2253" strokeWidth="3" strokeLinecap="round" opacity=".75" />
+        <path d="M10 84h24" stroke="#0069fc" strokeWidth="4" strokeLinecap="round" />
+      </g>
+    </svg>
+  );
 }

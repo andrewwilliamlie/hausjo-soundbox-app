@@ -3,7 +3,7 @@
 import Link from 'next/link';
 import { useState } from 'react';
 import Icon, { IconTile } from '@/components/Icon';
-import { CS_WHATSAPP, CS_WHATSAPP_DISPLAY } from '@/lib/contact';
+import { CS_HOURS, CS_WHATSAPP, CS_WHATSAPP_DISPLAY } from '@/lib/contact';
 import { CATEGORIES, TOPICS } from '@/lib/help';
 
 type Recent = { number: string; topic: string; topicId: string; status: string; open: boolean; at: string };
@@ -78,7 +78,7 @@ export default function HelpHome({ initialCat, recent }: { initialCat: string; r
           <a className="btn btn-ghost" style={{ flex: 1, gap: 6 }} href={`tel:+${CS_WHATSAPP}`}><Icon name="call" size={18} />Telepon CS</a>
           <a className="btn btn-ghost" style={{ flex: 1, gap: 6 }} href={`https://wa.me/${CS_WHATSAPP}`} target="_blank" rel="noreferrer"><Icon name="whatsapp" size={18} />WhatsApp</a>
         </div>
-        <span className="hint" style={{ textAlign: 'center' }}>CS AIPOS · {CS_WHATSAPP_DISPLAY}</span>
+        <span className="hint" style={{ textAlign: 'center' }}>CS AIPOS · {CS_WHATSAPP_DISPLAY}<br />{CS_HOURS}</span>
       </section>
     </main>
   );

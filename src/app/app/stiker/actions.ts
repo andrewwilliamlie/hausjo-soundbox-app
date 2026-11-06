@@ -55,7 +55,7 @@ export async function deleteAddress(id: string): Promise<Res> {
 }
 
 const order = z.object({
-  kind: z.enum(['STIKER', 'EDC', 'SOUNDBOX']).default('STIKER'),
+  kind: z.enum(['STIKER', 'EDC', 'SOUNDBOX', 'KERTAS']).default('STIKER'),
   qty: z.record(z.string(), z.number().int().min(0).max(100)),
   addressId: z.string().min(1, 'Pilih alamat pengiriman'),
   timeSlot: z.string().optional()
