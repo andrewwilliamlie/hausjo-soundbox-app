@@ -1,5 +1,6 @@
 'use client';
 
+import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { useEffect, useRef, useState, useTransition } from 'react';
 import Icon, { IconTile } from '@/components/Icon';
@@ -125,6 +126,7 @@ function SerialScanner({ onResult }: { onResult: (v: string) => void }) {
 export type SbWay = 'buy' | 'market' | 'sales' | 'arrived';
 
 export function SoundboxSheet({ initialWay = 'buy', onClose, onSaved }: { initialWay?: SbWay; onClose: () => void; onSaved: (msg: string) => void }) {
+  const router = useRouter();
   const [way, setWay] = useState<SbWay>(initialWay);
   const [f, setF] = useState({ marketplace: MARKETPLACES[0], orderNo: '', salesName: '', serial: '' });
   const { run, pending, error } = useRun((m) => { onClose(); onSaved(m); });
@@ -140,7 +142,7 @@ export function SoundboxSheet({ initialWay = 'buy', onClose, onSaved }: { initia
           </button>
         ))}
       </div>
-      {way === 'buy' && <p className="hint fade-in">Pembayaran lewat Doku. Link pembayaran dikirim setelah pendaftaran disetujui; Soundbox dikirim setelah QRIS aktif.</p>}
+      {way === 'buy' && <p className="hint fade-in">Pilih jumlah dan alamat pengiriman, lalu konfirmasi pesanan. Tim AIPOS mengirim link pembayaran ke WhatsApp Anda. <Link href="/app/soundbox">Lihat pesanan saya</Link></p>}
       {way === 'market' && (
         <>
           <div style={{ display: 'flex', flexWrap: 'wrap', gap: 8 }}>{MARKETPLACES.map((m) => <button key={m} type="button" className="chip" aria-pressed={f.marketplace === m} onClick={() => setF({ ...f, marketplace: m })}>{m}</button>)}</div>
@@ -157,7 +159,7 @@ export function SoundboxSheet({ initialWay = 'buy', onClose, onSaved }: { initia
       )}
       {error && <p className="err" role="alert">{error}</p>}
       <button type="button" className="btn btn-primary" disabled={pending || (way === 'arrived' && !f.serial)}
-        onClick={() => run(() => (way === 'arrived' ? submitSerial(f.serial) : setSoundbox({ way, marketplace: f.marketplace, orderNo: f.orderNo, salesName: f.salesName })))}>
+        onClick={() => (way === 'buy' ? router.push('/app/soundbox/pesan') : run(() => (way === 'arrived' ? submitSerial(f.serial) : setSoundbox({ way, marketplace: f.marketplace, orderNo: f.orderNo, salesName: f.salesName }))))}>
         {pending ? 'Menyimpan…' : way === 'buy' ? 'Pesan Soundbox' : way === 'market' ? 'Kirim No. Pesanan' : way === 'arrived' ? 'Minta panduan aktivasi' : 'Simpan'}
       </button>
     </Sheet>

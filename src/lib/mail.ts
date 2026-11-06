@@ -35,6 +35,13 @@ export async function sendMail(to: string, subject: string, text: string, attach
 
 const APP = () => process.env.APP_URL || 'https://app.aipos.co.id';
 
+type ShopKind = 'STIKER' | 'EDC' | 'SOUNDBOX';
+const SHOP: Record<ShopKind, { name: string; long: string; after: string; path: string }> = {
+  STIKER: { name: 'stiker', long: 'stiker QRIS', after: 'Stiker dicetak', path: 'stiker' },
+  EDC: { name: 'EDC', long: 'EDC', after: 'EDC disiapkan', path: 'edc' },
+  SOUNDBOX: { name: 'Soundbox', long: 'Soundbox QRIS', after: 'Soundbox disiapkan', path: 'soundbox' }
+};
+
 export const mails = {
   submitted: (ticket: string) => ({
     subject: `Pendaftaran AIPOS diterima · ${ticket}`,
@@ -44,13 +51,13 @@ export const mails = {
     subject: `Perlu perbaikan foto · ${ticket}`,
     text: `Ada foto yang perlu diganti:\n${items.map((i) => '- ' + i).join('\n')}\n\nFoto lain sudah disetujui. Unggah ulang di:\n${APP()}/app\n\nAIPOS`
   }),
-  stickerOrdered: (no: string, store: string, items: string, total: string, kind: 'STIKER' | 'EDC' = 'STIKER') => ({
-    subject: `Pesanan ${kind === 'EDC' ? 'EDC' : 'stiker'} diterima · ${no}`,
-    text: `Pesanan ${kind === 'EDC' ? 'EDC' : 'stiker QRIS'} untuk ${store} sudah kami terima.\n\n${items}\nTotal: ${total}\n\nTim AIPOS akan mengirim link pembayaran ke WhatsApp Anda di jam kerja. ${kind === 'EDC' ? 'EDC disiapkan' : 'Stiker dicetak'} setelah pembayaran diterima. Lihat status pesanan:\n${APP()}/app/${kind === 'EDC' ? 'edc' : 'stiker'}\n\nAIPOS`
+  stickerOrdered: (no: string, store: string, items: string, total: string, kind: ShopKind = 'STIKER') => ({
+    subject: `Pesanan ${SHOP[kind].name} diterima · ${no}`,
+    text: `Pesanan ${SHOP[kind].long} untuk ${store} sudah kami terima.\n\n${items}\nTotal: ${total}\n\nTim AIPOS akan mengirim link pembayaran ke WhatsApp Anda di jam kerja. ${SHOP[kind].after} setelah pembayaran diterima. Lihat status pesanan:\n${APP()}/app/${SHOP[kind].path}\n\nAIPOS`
   }),
-  stickerStatus: (no: string, status: string, extra = '', kind: 'STIKER' | 'EDC' = 'STIKER') => ({
+  stickerStatus: (no: string, status: string, extra = '', kind: ShopKind = 'STIKER') => ({
     subject: `${status} · ${no}`,
-    text: `Status pesanan ${kind === 'EDC' ? 'EDC' : 'stiker'} ${no}: ${status}.${extra ? '\n\n' + extra : ''}\n\nLihat detailnya:\n${APP()}/app/${kind === 'EDC' ? 'edc' : 'stiker'}\n\nAIPOS`
+    text: `Status pesanan ${SHOP[kind].name} ${no}: ${status}.${extra ? '\n\n' + extra : ''}\n\nLihat detailnya:\n${APP()}/app/${SHOP[kind].path}\n\nAIPOS`
   }),
   active: (ticket: string, name: string) => ({
     subject: `QRIS Anda sudah aktif · ${name}`,

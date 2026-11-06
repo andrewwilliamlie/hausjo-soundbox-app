@@ -61,7 +61,7 @@ export async function setSoundbox(input: z.infer<typeof sbSchema>): Promise<Resu
   return {
     ok: true,
     message: d.way === 'buy'
-      ? 'Pesanan dicatat. Link pembayaran Doku dikirim tim kami setelah QRIS disetujui.'
+      ? 'Pesanan dicatat. Link pembayaran dikirim tim kami lewat WhatsApp.'
       : 'Terima kasih. Admin mencocokkan pesanan Anda.'
   };
 }

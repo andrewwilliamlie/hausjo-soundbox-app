@@ -8,7 +8,7 @@ import { currentOutletId, merchantId } from '@/lib/auth';
 import { CS_EMAIL } from '@/lib/contact';
 import { db } from '@/lib/db';
 import { mails, sendMail } from '@/lib/mail';
-import { KIND_NAME, KIND_PATH, KIND_PREFIX, TIME_SLOTS, itemsText, priceOrder, rp } from '@/lib/sticker';
+import { KIND_NAME, KIND_PATH, KIND_PREFIX, asKind, TIME_SLOTS, itemsText, priceOrder, rp } from '@/lib/sticker';
 import { todayISO } from '@/lib/invoice';
 
 export type Res<T = undefined> = { ok: true; data?: T } | { ok: false; error: string };
@@ -55,7 +55,7 @@ export async function deleteAddress(id: string): Promise<Res> {
 }
 
 const order = z.object({
-  kind: z.enum(['STIKER', 'EDC']).default('STIKER'),
+  kind: z.enum(['STIKER', 'EDC', 'SOUNDBOX']).default('STIKER'),
   qty: z.record(z.string(), z.number().int().min(0).max(100)),
   addressId: z.string().min(1, 'Pilih alamat pengiriman'),
   timeSlot: z.string().optional()
@@ -81,7 +81,7 @@ export async function placeOrder(raw: unknown): Promise<Res<string>> {
   const addr = await db.shipAddress.findFirst({ where: { id: p.data.addressId, userId: uid } });
   if (!addr) return { ok: false, error: 'Pilih alamat pengiriman' };
   const t = priceOrder(p.data.qty, kind);
-  if (!t.items.length) return { ok: false, error: kind === 'EDC' ? 'Pilih minimal 1 mesin EDC' : 'Pilih minimal 1 paket' };
+  if (!t.items.length) return { ok: false, error: kind === 'STIKER' ? 'Pilih minimal 1 paket' : 'Pilih minimal 1 unit' };
   // One open (unpaid) order per store at a time, so a double tap doesn't create two.
   const open = await db.stickerOrder.findFirst({ where: { userId: uid, applicationId: store.id, kind, status: 'UNPAID', createdAt: { gt: new Date(Date.now() - 60_000) } } });
   if (open) return { ok: true, data: open.id };
@@ -101,11 +101,14 @@ export async function placeOrder(raw: unknown): Promise<Res<string>> {
           history: [{ s: 'UNPAID', at: new Date().toISOString() }]
         }
       });
+      // Buying a Soundbox in the app marks the store's Soundbox as ordered (the activation checklist reads this).
+      if (kind === 'SOUNDBOX') await db.application.update({ where: { id: store.id }, data: { product: 'SOUNDBOX', soundboxStatus: 'BUY', marketplace: null, orderNo: o.number, salesName: null } });
       const m = mails.stickerOrdered(o.number, store.businessName ?? '', itemsText(t.items), rp(t.total), kind);
       void sendMail(store.user.email, m.subject, m.text);
       void sendMail(process.env.ORDER_NOTIFY_EMAIL || CS_EMAIL, `Pesanan ${KIND_NAME[kind]} baru · ${o.number}`,
         `${store.businessName} (${store.ticket}, NMID ${store.nmid ?? 'belum ada'})\n${itemsText(t.items)}\nTotal ${rp(t.total)}\n\nKirim ke: ${addr.recipient} · ${addr.phone}\n${addr.address}, ${addr.kelurahan}, ${addr.kecamatan}, ${addr.city}, ${addr.province} ${addr.postalCode}\n\nKelola di ${process.env.APP_URL || 'https://app.aipos.co.id'}/admin/stiker`);
       revalidatePath(KIND_PATH[kind]);
+      revalidatePath('/app');
       return { ok: true, data: o.id };
     } catch (e) {
       if (!(e instanceof Prisma.PrismaClientKnownRequestError && e.code === 'P2002')) throw e;
@@ -122,6 +125,6 @@ export async function cancelOrder(id: string): Promise<Res> {
   if (o.status !== 'UNPAID') return { ok: false, error: 'Pesanan yang sudah dibayar tidak bisa dibatalkan di aplikasi. Hubungi CS.' };
   const history = [...((o.history as unknown as object[]) ?? []), { s: 'CANCELLED', at: new Date().toISOString(), by: 'Merchant' }];
   await db.stickerOrder.update({ where: { id }, data: { status: 'CANCELLED', history: history as unknown as Prisma.InputJsonValue } });
-  revalidatePath(KIND_PATH[o.kind === 'EDC' ? 'EDC' : 'STIKER']);
+  revalidatePath(KIND_PATH[asKind(o.kind)]);
   return { ok: true };
 }

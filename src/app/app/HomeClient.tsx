@@ -12,7 +12,7 @@ import { BankSheet, SoundboxSheet, useToast, type SbWay } from './Sheets';
 
 const SB_SUB: Record<AppView['soundboxStatus'], string> = {
   NONE: 'Rp349.000 sekali bayar, opsional',
-  BUY: 'Dipesan · link pembayaran dikirim setelah disetujui',
+  BUY: 'Dipesan · cek status di menu Soundbox',
   MARKETPLACE: 'Pesanan marketplace dicocokkan admin',
   SALES: 'Pesanan lewat sales dicocokkan admin',
   ARRIVED: 'Diterima · CS akan memandu aktivasi'

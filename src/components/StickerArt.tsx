@@ -115,6 +115,7 @@ export function ProductThumb({ code, size = 48 }: { code: string; size?: number 
   if (code === 'A620') return <EdcSmallThumb size={size} />;
   if (code === 'A920PRO') return <EdcLargeThumb size={size} />;
   if (code === 'AKRILIK') return <AcrylicThumb size={size} />;
+  if (code === 'SOUNDBOX') return <SoundboxThumb size={size} />;
   return <StickerThumb size={size} />;
 }
 
@@ -153,4 +154,49 @@ export function EdcHero() {
       </g>
     </svg>
   );
+}
+
+/** Small speaker box with a QR on the front and sound waves (Soundbox). */
+export function SoundboxThumb({ size = 48 }: { size?: number }) {
+  return (
+    <svg width={size} height={size} viewBox="0 0 48 48" aria-hidden="true">
+      <rect x="7" y="8" width="26" height="34" rx="7" fill="#fff" stroke="#0b2253" strokeWidth="2" />
+      <Pattern x={12} y={13} size={16} />
+      <text x="20" y="38" textAnchor="middle" fontSize="5" fontWeight="800" fill="#0b2253" fontFamily="inherit">AIPOS</text>
+      <path d="M37 18a8 8 0 0 1 0 12M41 14a14 14 0 0 1 0 20" fill="none" stroke="#0069fc" strokeWidth="2.2" strokeLinecap="round" />
+    </svg>
+  );
+}
+
+/** Top banner for "Beli Soundbox": the speaker announcing a payment. */
+export function SoundboxHero() {
+  return (
+    <svg viewBox="0 0 360 170" width="100%" style={{ display: 'block' }} role="img" aria-label="Soundbox QRIS">
+      <defs>
+        <linearGradient id="sbx-bg" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stopColor="#0069fc" /><stop offset="1" stopColor="#0a2a6e" /></linearGradient>
+      </defs>
+      <rect width="360" height="170" fill="url(#sbx-bg)" />
+      <circle cx="40" cy="20" r="70" fill="#fff" opacity=".07" />
+      <rect y="142" width="360" height="28" fill="#061a45" opacity=".4" />
+      <g transform="translate(108 22)">
+        <rect width="86" height="122" rx="22" fill="#fff" />
+        <Pattern x={18} y={18} size={50} />
+        <text x="43" y="98" textAnchor="middle" fontSize="12" fontWeight="800" fill="#0b2253" fontFamily="inherit">AIPOS</text>
+        <rect x="30" y="106" width="26" height="4" rx="2" fill="#cfe0ff" />
+      </g>
+      <g fill="none" stroke="#fff" strokeLinecap="round" strokeWidth="5" opacity=".85">
+        <path d="M212 66a24 24 0 0 1 0 40" /><path d="M226 52a44 44 0 0 1 0 68" opacity=".6" />
+      </g>
+      <g transform="translate(236 28)">
+        <rect width="112" height="34" rx="12" fill="#fff" />
+        <text x="56" y="15" textAnchor="middle" fontSize="9" fontWeight="700" fill="#4a5878" fontFamily="inherit">Pembayaran diterima</text>
+        <text x="56" y="27" textAnchor="middle" fontSize="10.5" fontWeight="800" fill="#067647" fontFamily="inherit">Rp25.000</text>
+      </g>
+    </svg>
+  );
+}
+
+/** Banner for a shop kind. */
+export function ShopHero({ kind }: { kind: 'STIKER' | 'EDC' | 'SOUNDBOX' }) {
+  return kind === 'EDC' ? <EdcHero /> : kind === 'SOUNDBOX' ? <SoundboxHero /> : <StickerHero />;
 }

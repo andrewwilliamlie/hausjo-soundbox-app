@@ -1,7 +1,7 @@
 import Link from 'next/link';
 import { requireAdmin } from '@/lib/auth';
 import { db } from '@/lib/db';
-import { STATUS_LABEL, STATUS_TONE, asKind, itemsText, rp, statusLabel, type OrderItem, type StickerStatus } from '@/lib/sticker';
+import { KIND_LABEL, STATUS_LABEL, STATUS_TONE, asKind, itemsText, rp, statusLabel, type OrderItem, type StickerStatus } from '@/lib/sticker';
 import AdminHeader from '../AdminHeader';
 import { updateStickerOrder } from './actions';
 
@@ -12,12 +12,12 @@ const FILTERS: Array<[string, string]> = [['open', 'Perlu diproses'], ['UNPAID',
 const STATUSES = Object.keys(STATUS_LABEL) as StickerStatus[];
 const when = (d: Date) => d.toLocaleString('id-ID', { timeZone: 'Asia/Jakarta', dateStyle: 'medium', timeStyle: 'short' });
 
-const KINDS: Array<[string, string]> = [['all', 'Semua produk'], ['STIKER', 'Stiker'], ['EDC', 'EDC']];
+const KINDS: Array<[string, string]> = [['all', 'Semua produk'], ['STIKER', 'Stiker'], ['EDC', 'EDC'], ['SOUNDBOX', 'Soundbox']];
 
 export default async function StickerOrdersAdmin({ searchParams }: { searchParams: Promise<{ f?: string; k?: string }> }) {
   const admin = await requireAdmin(['ACTIVATION']);
   const { f = 'open', k = 'all' } = await searchParams;
-  const kindWhere = k === 'STIKER' || k === 'EDC' ? { kind: k } : {};
+  const kindWhere = k === 'STIKER' || k === 'EDC' || k === 'SOUNDBOX' ? { kind: k } : {};
   const where = { ...kindWhere, ...(f === 'all' ? {} : f === 'open' ? { status: { in: ['UNPAID', 'PAID', 'PRINTING'] as StickerStatus[] } } : { status: f as StickerStatus }) };
   const orders = await db.stickerOrder.findMany({ where, orderBy: { createdAt: 'desc' }, take: 200, include: { user: { select: { email: true } } } });
   const stores = await db.application.findMany({
@@ -35,8 +35,8 @@ export default async function StickerOrdersAdmin({ searchParams }: { searchParam
       <AdminHeader admin={admin} tab="stiker" />
       <div className="admin-wrap" style={{ maxWidth: 1000 }}>
         <div>
-          <h1 style={{ margin: 0, fontSize: 22, fontWeight: 800 }}>Pesanan stiker &amp; EDC</h1>
-          <p className="hint" style={{ marginTop: 4 }}>Alur: kirim link pembayaran ke WhatsApp merchant → tandai Sudah bayar → stiker: unduh QRIS toko lalu cetak; EDC: siapkan mesin dan catat SN → Dikirim dengan nomor resi. Merchant menerima email tiap status berubah.</p>
+          <h1 style={{ margin: 0, fontSize: 22, fontWeight: 800 }}>Pesanan stiker, EDC &amp; Soundbox</h1>
+          <p className="hint" style={{ marginTop: 4 }}>Alur: kirim link pembayaran ke WhatsApp merchant → tandai Sudah bayar → stiker: unduh QRIS toko lalu cetak; EDC/Soundbox: siapkan perangkat dan catat SN → Dikirim dengan nomor resi. Merchant menerima email tiap status berubah.</p>
         </div>
         <nav style={{ display: 'flex', gap: 8, flexWrap: 'wrap' }} aria-label="Filter produk">
           {KINDS.map(([key, label]) => (
@@ -61,7 +61,7 @@ export default async function StickerOrdersAdmin({ searchParams }: { searchParam
               <div style={{ display: 'flex', justifyContent: 'space-between', gap: 10, flexWrap: 'wrap', alignItems: 'center' }}>
                 <span style={{ display: 'flex', gap: 10, alignItems: 'center', flexWrap: 'wrap' }}>
                   <strong style={{ fontSize: 15 }}>{o.number}</strong>
-                  <span className="tag">{kind === 'EDC' ? 'EDC' : 'Stiker'}</span>
+                  <span className="tag">{KIND_LABEL[kind]}</span>
                   <span style={{ fontSize: 12, fontWeight: 700, padding: '3px 9px', borderRadius: 999, background: bg, color: fg }}>{statusLabel(s, kind)}</span>
                   <span className="hint">{when(o.createdAt)} WIB</span>
                 </span>
@@ -100,7 +100,7 @@ export default async function StickerOrdersAdmin({ searchParams }: { searchParam
                 <label className="field">Nomor resi
                   <input name="trackingNo" className="input" defaultValue={o.trackingNo ?? ''} />
                 </label>
-                <label className="field" style={{ gridColumn: '1 / -1' }}>{kind === 'EDC' ? 'Catatan internal (mis. SN mesin)' : 'Catatan internal'}
+                <label className="field" style={{ gridColumn: '1 / -1' }}>{kind === 'STIKER' ? 'Catatan internal' : 'Catatan internal (mis. SN perangkat)'}
                   <input name="adminNote" className="input" defaultValue={o.adminNote ?? ''} />
                 </label>
                 <button className="btn btn-primary">Simpan</button>

@@ -1,24 +1,27 @@
-// Shop orders in the app: printed QRIS stickers and EDC terminals. Change products and prices here.
+// Shop orders in the app: printed QRIS stickers, EDC terminals and the Soundbox. Change products and prices here.
 import { rp } from './invoice';
 
-export type Kind = 'STIKER' | 'EDC';
+export type Kind = 'STIKER' | 'EDC' | 'SOUNDBOX';
 export type Package = { kind: Kind; code: string; name: string; desc: string; normalPrice: number; price: number; max: number };
 
 export const PACKAGES: Package[] = [
   { kind: 'STIKER', code: 'STIKER', name: 'Paket Hemat', desc: 'Stiker QRIS saja', normalPrice: 5000, price: 2500, max: 20 },
   { kind: 'STIKER', code: 'AKRILIK', name: 'Paket Akrilik', desc: 'Stiker QRIS dan stand akrilik', normalPrice: 25000, price: 16000, max: 10 },
   { kind: 'EDC', code: 'A620', name: 'PAX A620', desc: 'Mendukung QRIS dinamis', normalPrice: 699000, price: 699000, max: 5 },
-  { kind: 'EDC', code: 'A920PRO', name: 'PAX A920 Pro', desc: 'Mendukung kartu debit, kartu kredit & QRIS', normalPrice: 2999000, price: 2999000, max: 5 }
+  { kind: 'EDC', code: 'A920PRO', name: 'PAX A920 Pro', desc: 'Mendukung kartu debit, kartu kredit & QRIS', normalPrice: 2999000, price: 2999000, max: 5 },
+  { kind: 'SOUNDBOX', code: 'SOUNDBOX', name: 'Soundbox QRIS', desc: 'Menyebut nominal setiap pembayaran QRIS. Sekali bayar, tanpa sewa', normalPrice: 349000, price: 349000, max: 5 }
 ];
-// Shipping per order. EDC shipping is to be confirmed by the business; 0 shows as "Gratis".
-export const SHIPPING_FEE: Record<Kind, number> = { STIKER: 10000, EDC: 0 };
+// Shipping per order. EDC and Soundbox shipping are to be confirmed by the business; 0 shows as "Gratis".
+export const SHIPPING_FEE: Record<Kind, number> = { STIKER: 10000, EDC: 0, SOUNDBOX: 0 };
 export const TIME_SLOTS = ['07.00-12.00', '12.00-17.00', '17.00-22.00'];
 export const ADDRESS_LABELS = ['Toko', 'Rumah', 'Kantor'];
-export const KIND_PREFIX: Record<Kind, string> = { STIKER: 'STK', EDC: 'EDC' };
-export const KIND_PATH: Record<Kind, string> = { STIKER: '/app/stiker', EDC: '/app/edc' };
-export const KIND_NAME: Record<Kind, string> = { STIKER: 'stiker', EDC: 'EDC' };
+export const KINDS: Kind[] = ['STIKER', 'EDC', 'SOUNDBOX'];
+export const KIND_PREFIX: Record<Kind, string> = { STIKER: 'STK', EDC: 'EDC', SOUNDBOX: 'SBX' };
+export const KIND_PATH: Record<Kind, string> = { STIKER: '/app/stiker', EDC: '/app/edc', SOUNDBOX: '/app/soundbox' };
+export const KIND_NAME: Record<Kind, string> = { STIKER: 'stiker', EDC: 'EDC', SOUNDBOX: 'Soundbox' };
+export const KIND_LABEL: Record<Kind, string> = { STIKER: 'Stiker', EDC: 'EDC', SOUNDBOX: 'Soundbox' };
 export const packagesOf = (kind: Kind) => PACKAGES.filter((p) => p.kind === kind);
-export const asKind = (k: string | null | undefined): Kind => (k === 'EDC' ? 'EDC' : 'STIKER');
+export const asKind = (k: string | null | undefined): Kind => (k === 'EDC' || k === 'SOUNDBOX' ? k : 'STIKER');
 
 export type OrderItem = { code: string; name: string; qty: number; price: number; normalPrice: number };
 export type StickerStatus = 'UNPAID' | 'PAID' | 'PRINTING' | 'SHIPPED' | 'DONE' | 'CANCELLED';
@@ -27,8 +30,8 @@ export const STATUS_LABEL: Record<StickerStatus, string> = {
   UNPAID: 'Menunggu pembayaran', PAID: 'Pembayaran diterima', PRINTING: 'Sedang dicetak',
   SHIPPED: 'Dalam pengiriman', DONE: 'Pesanan diterima', CANCELLED: 'Dibatalkan'
 };
-/** Status name for an order kind: an EDC is prepared, not printed. */
-export const statusLabel = (s: StickerStatus, kind: Kind = 'STIKER') => (kind === 'EDC' && s === 'PRINTING' ? 'Sedang disiapkan' : STATUS_LABEL[s]);
+/** Status name for an order kind: devices are prepared, not printed. */
+export const statusLabel = (s: StickerStatus, kind: Kind = 'STIKER') => (kind !== 'STIKER' && s === 'PRINTING' ? 'Sedang disiapkan' : STATUS_LABEL[s]);
 export const STATUS_TONE: Record<StickerStatus, [string, string]> = {
   UNPAID: ['#fff4e5', '#b54708'], PAID: ['#e8f1ff', '#0058d6'], PRINTING: ['#f1edff', '#4a2ba8'],
   SHIPPED: ['#e8f1ff', '#0058d6'], DONE: ['#ecfdf3', '#067647'], CANCELLED: ['#fef3f2', '#b42318']

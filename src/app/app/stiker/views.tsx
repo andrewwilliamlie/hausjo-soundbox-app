@@ -1,10 +1,10 @@
 import Link from 'next/link';
 import { notFound, redirect } from 'next/navigation';
 import Icon from '@/components/Icon';
-import { EdcHero, ProductThumb, StickerHero } from '@/components/StickerArt';
+import { ProductThumb, ShopHero } from '@/components/StickerArt';
 import { waLink } from '@/lib/contact';
 import { db } from '@/lib/db';
-import { FLOW, KIND_PATH, STATUS_TONE, asKind, feeText, itemsText, rp, statusLabel, type Kind, type OrderItem, type StickerStatus } from '@/lib/sticker';
+import { FLOW, KIND_NAME, KIND_PATH, STATUS_TONE, asKind, feeText, itemsText, rp, statusLabel, type Kind, type OrderItem, type StickerStatus } from '@/lib/sticker';
 import PageTop from '../PageTop';
 import CancelOrder from './[id]/CancelOrder';
 import { stickerContext } from './data';
@@ -18,6 +18,10 @@ const COPY: Record<Kind, { title: string; sub: string; cta: string; intro: (stor
   EDC: {
     title: 'Beli EDC', sub: 'PAX A620 & PAX A920 Pro', cta: 'Beli sekarang',
     intro: (s) => `Mesin EDC untuk ${s}`, empty: 'Belum ada pesanan EDC.'
+  },
+  SOUNDBOX: {
+    title: 'Beli Soundbox', sub: 'Soundbox QRIS', cta: 'Beli sekarang',
+    intro: (s) => `Soundbox QRIS untuk ${s}`, empty: 'Belum ada pesanan Soundbox.'
   }
 };
 
@@ -36,7 +40,7 @@ export async function OrdersList({ kind }: { kind: Kind }) {
       <PageTop title={C.title} sub={C.sub} />
       <main className="app-sheet inner" style={{ display: 'flex', flexDirection: 'column', gap: 14 }}>
         <section className="card" style={{ padding: 0, overflow: 'hidden', gap: 0 }}>
-          {kind === 'EDC' ? <EdcHero /> : <StickerHero />}
+          <ShopHero kind={kind} />
           <div style={{ padding: 16, display: 'flex', flexDirection: 'column', gap: 10 }}>
             <strong style={{ fontSize: 16 }}>{C.intro(app.businessName ?? 'toko Anda')}</strong>
             {kind === 'EDC' && (
@@ -48,13 +52,14 @@ export async function OrdersList({ kind }: { kind: Kind }) {
             {ok ? (
               <>
                 {kind === 'STIKER' && <span className="hint">Pilih stiker saja atau stiker dengan stand akrilik. Dikirim ke alamat Anda.</span>}
-                <Link href={`${KIND_PATH[kind]}/pesan`} className="btn btn-primary btn-block" style={{ gap: 8 }}><Icon name={kind === 'EDC' ? 'edc' : 'printer'} size={18} />{C.cta}</Link>
+                {kind === 'SOUNDBOX' && <span className="hint">Menyebut nominal setiap pembayaran QRIS. {rp(349000)} sekali bayar, tanpa sewa.</span>}
+                <Link href={`${KIND_PATH[kind]}/pesan`} className="btn btn-primary btn-block" style={{ gap: 8 }}><Icon name={kind === 'EDC' ? 'edc' : kind === 'SOUNDBOX' ? 'speaker' : 'printer'} size={18} />{C.cta}</Link>
               </>
             ) : (
               <>
                 <span className="hint">{kind === 'STIKER'
                   ? 'Stiker berisi QRIS toko ini, jadi baru bisa dipesan setelah QRIS aktif. Kami kabari lewat email saat QRIS terbit.'
-                  : 'Pendaftaran toko ini ditolak, jadi EDC belum bisa dipesan. Hubungi CS AIPOS.'}</span>
+                  : `Pendaftaran toko ini ditolak, jadi ${KIND_NAME[kind]} belum bisa dipesan. Hubungi CS AIPOS.`}</span>
                 {outletCount > 1 && <Link href="/app/toko" className="btn btn-ghost btn-block">Pilih toko lain</Link>}
               </>
             )}
@@ -117,7 +122,7 @@ export async function OrderDetail({ kind, id, baru }: { kind: Kind; id: string; 
   const history = (o.history as unknown as Array<{ s: StickerStatus; at: string }>) ?? [];
   const atOf = (st: StickerStatus) => history.filter((h) => h.s === st).at(-1)?.at;
   const idx = FLOW.indexOf(s);
-  const what = kind === 'EDC' ? 'EDC' : 'stiker';
+  const what = KIND_NAME[kind];
   const wa = waLink(`Halo AIPOS, saya mau bayar pesanan ${what} ${o.number} (${rp(o.total)}) untuk ${store?.businessName ?? 'toko saya'}.`);
 
   return (
@@ -157,7 +162,7 @@ export async function OrderDetail({ kind, id, baru }: { kind: Kind; id: string; 
             </>
           )}
           {s === 'SHIPPED' && o.trackingNo && <span className="note">Nomor resi <b>{o.trackingNo}</b>{o.courier ? ` (${o.courier})` : ''}. Lacak di situs kurir.</span>}
-          {kind === 'EDC' && s === 'DONE' && <span className="note">Butuh bantuan aktivasi EDC? <a href={waLink(`Halo AIPOS, EDC pesanan ${o.number} sudah sampai, saya mau aktivasi.`)} target="_blank" rel="noreferrer">Hubungi CS</a>.</span>}
+          {kind !== 'STIKER' && s === 'DONE' && <span className="note">Butuh bantuan aktivasi {what}? <a href={waLink(`Halo AIPOS, ${what} pesanan ${o.number} sudah sampai, saya mau aktivasi.`)} target="_blank" rel="noreferrer">Hubungi CS</a>.</span>}
         </section>
 
         <section className="card" style={{ gap: 4 }}>

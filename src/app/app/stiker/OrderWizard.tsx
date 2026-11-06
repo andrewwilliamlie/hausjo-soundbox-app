@@ -4,7 +4,7 @@ import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { useState, useTransition } from 'react';
 import Icon from '@/components/Icon';
-import { EdcHero, ProductThumb, StickerHero } from '@/components/StickerArt';
+import { ProductThumb, ShopHero } from '@/components/StickerArt';
 import { ADDRESS_LABELS, KIND_PATH, SHIPPING_FEE, TIME_SLOTS, feeText, packagesOf, priceOrder, rp, type Kind } from '@/lib/sticker';
 import RegionPicker from '../../daftar/langkah/RegionPicker';
 import { Sheet } from '../Sheets';
@@ -24,6 +24,12 @@ const TEXT: Record<Kind, { title: string; pick: string; unit: string; note: stri
     note: 'EDC disiapkan untuk toko ini. Untuk toko lain, ganti toko dulu di menu Toko saya.',
     what: 'PAX A620 untuk pembayaran QRIS dinamis: nominal muncul langsung di layar, pembeli tinggal scan. PAX A920 Pro menerima kartu debit, kartu kredit dan QRIS. CS AIPOS memandu aktivasi setelah mesin sampai.',
     after: 'EDC disiapkan setelah pembayaran diterima, lalu dikirim ke alamat Anda.'
+  },
+  SOUNDBOX: {
+    title: 'Beli Soundbox', pick: 'Soundbox QRIS', unit: 'unit',
+    note: 'Soundbox disambungkan ke QRIS toko ini. Untuk toko lain, ganti toko dulu di menu Toko saya.',
+    what: 'Soundbox menyebut nominal setiap pembayaran QRIS yang masuk, jadi Anda tidak perlu cek HP. Sekali bayar, jadi milik Anda, tanpa sewa. CS AIPOS memandu aktivasi setelah Soundbox sampai.',
+    after: 'Soundbox disiapkan setelah pembayaran diterima, lalu dikirim ke alamat Anda.'
   }
 };
 
@@ -99,7 +105,7 @@ export default function OrderWizard({ kind, store, saved, blank }: { kind: Kind;
       <main className="app-sheet inner">
         {step === 'paket' && (
           <div className="screen-in" style={{ display: 'flex', flexDirection: 'column', gap: 14 }}>
-            <div style={{ borderRadius: 16, overflow: 'hidden' }}>{kind === 'EDC' ? <EdcHero /> : <StickerHero />}</div>
+            <div style={{ borderRadius: 16, overflow: 'hidden' }}><ShopHero kind={kind} /></div>
             <section className="card" style={{ gap: 14 }}>
               <strong style={{ fontSize: 16 }}>{T.pick}</strong>
               <p className="note" style={{ margin: 0, fontSize: 13, background: 'var(--warn-soft)', border: '1px solid #f7c98b', borderRadius: 12, padding: '10px 12px' }}>
