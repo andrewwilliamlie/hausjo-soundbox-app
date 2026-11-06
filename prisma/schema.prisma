@@ -79,6 +79,7 @@ model User {
   products       InvoiceProduct[]
   invoiceCode    String?   // short code in invoice numbers, e.g. INV-WMR-261105-001
   stickerOrders  StickerOrder[]
+  helpRequests   HelpRequest[]
   shipAddresses  ShipAddress[]
 }
 
@@ -344,4 +345,26 @@ model ShipAddress {
   updatedAt   DateTime @updatedAt
 
   @@index([userId])
+}
+
+// "Minta CS menelepon saya" from the Bantuan help center, after the merchant tried the guide.
+model HelpRequest {
+  id            String    @id @default(cuid())
+  number        String    @unique // BNT-YYMMDD-XXXX
+  userId        String
+  user          User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  applicationId String?   // the store being viewed when asking
+  topic         String    // help topic id, e.g. "edc-offline"
+  phone         String    // number CS should call
+  callTime      String    // Secepatnya / Pagi / Siang / Sore
+  note          String?
+  triedSteps    Int       @default(0) // how many guide steps the merchant ticked
+  status        String    @default("OPEN") // OPEN | CALLED | DONE
+  adminNote     String?
+  handledBy     String?
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
+
+  @@index([status, createdAt])
+  @@index([userId, createdAt])
 }

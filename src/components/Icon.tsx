@@ -58,6 +58,7 @@ const PATHS: Record<string, React.ReactNode> = {
   hammer: <><path d="M14 3.5l6.5 6.5-2.5 2.5-6.5-6.5z" /><path d="M12.8 7.8l-9 9a1.6 1.6 0 0 0 2.4 2.4l9-9" /></>,
   leaf: <><path d="M5 19c0-9 6-14 15-14 0 9-5 15-14 15" /><path d="M5 19l8-8" /></>,
   tag: <><path d="M3 12V4h8l10 10-8 8z" /><circle cx="7.5" cy="8.5" r="1.5" /></>,
+  call: <path d="M5 4h3.5l1.5 4-2 1.5a11 11 0 0 0 6.5 6.5l1.5-2 4 1.5V19a2 2 0 0 1-2 2A16 16 0 0 1 3 6a2 2 0 0 1 2-2z" />,
   alert: <><path d="M12 3l10 18H2z" /><path d="M12 10v5M12 18h.01" /></>
 };
 

@@ -5,7 +5,6 @@ import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { useState } from 'react';
 import Icon, { type IconName } from '@/components/Icon';
-import { waLink } from '@/lib/contact';
 import type { AppView } from '@/lib/merchant-view';
 import { Upload } from '../daftar/langkah/Upload';
 import { BankSheet, SoundboxSheet, useToast, type SbWay } from './Sheets';
@@ -60,7 +59,7 @@ export default function HomeClient({ app, isNew, outletCount }: { app: AppView; 
     { icon: 'edc', label: 'Beli EDC', href: '/app/edc' },
     { icon: 'gift', label: 'Referral', action: soon, soon: true },
     { icon: 'sort', label: 'Laporan', action: soon, soon: true },
-    { icon: 'help', label: 'Bantuan', href: waLink(`Halo AIPOS, saya butuh bantuan. Tiket ${app.ticket}.`), external: true },
+    { icon: 'help', label: 'Bantuan', href: '/app/bantuan' },
     { icon: 'grid', label: 'Lainnya', href: '/app/akun' }
   ];
   const q = query.trim().toLowerCase();

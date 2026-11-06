@@ -1,6 +1,6 @@
 import Link from 'next/link';
 import Icon from '@/components/Icon';
-import { CS_WHATSAPP_DISPLAY, waLink } from '@/lib/contact';
+import { CS_WHATSAPP_DISPLAY } from '@/lib/contact';
 import { loadMerchantView } from '@/lib/merchant-view';
 import { logout } from '../../masuk/actions';
 import PageTop from '../PageTop';
@@ -40,7 +40,7 @@ export default async function AccountPage() {
         <PasswordForm />
 
         <nav className="card rise rise-2 menu-list" aria-label="Lainnya">
-          <a href={waLink(`Halo AIPOS, saya butuh bantuan. Tiket ${app.ticket}.`)} target="_blank" rel="noreferrer"><Icon name="whatsapp" size={20} />Bantuan CS · {CS_WHATSAPP_DISPLAY}<Icon name="chevron" size={18} /></a>
+          <Link href="/app/bantuan"><Icon name="help" size={20} />Bantuan · panduan &amp; CS {CS_WHATSAPP_DISPLAY}<Icon name="chevron" size={18} /></Link>
           <a href="https://hausjo.id/produk" target="_blank" rel="noreferrer"><Icon name="edc" size={20} />Beli EDC<Icon name="chevron" size={18} /></a>
           <Link href="/syarat-ketentuan"><Icon name="file" size={20} />Syarat &amp; Ketentuan<Icon name="chevron" size={18} /></Link>
           <Link href="/kebijakan-privasi"><Icon name="shield" size={20} />Kebijakan Privasi<Icon name="chevron" size={18} /></Link>
