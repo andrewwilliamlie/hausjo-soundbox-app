@@ -81,3 +81,76 @@ export function StickerHero() {
     </svg>
   );
 }
+
+/** Compact countertop/handheld terminal with a small screen and keypad (A620). */
+export function EdcSmallThumb({ size = 48 }: { size?: number }) {
+  return (
+    <svg width={size} height={size} viewBox="0 0 48 48" aria-hidden="true">
+      <rect x="13" y="3" width="22" height="42" rx="5" fill="#0b2253" />
+      <rect x="16" y="7" width="16" height="13" rx="2" fill="#cfe0ff" />
+      <Pattern x={19.5} y={8.5} size={9} color="#0069fc" />
+      <g fill="#8db4ff">
+        {[0, 1, 2].flatMap((r) => [0, 1, 2].map((c) => <rect key={`${r}${c}`} x={16.5 + c * 5.5} y={24 + r * 5} width="4" height="3.2" rx="1" />))}
+      </g>
+      <rect x="16.5" y="39" width="4" height="3" rx="1" fill="#f04438" /><rect x="22" y="39" width="4" height="3" rx="1" fill="#fdb022" /><rect x="27.5" y="39" width="4" height="3" rx="1" fill="#12b76a" />
+    </svg>
+  );
+}
+
+/** Larger touch-screen terminal with a receipt printer on top (A920 Pro). */
+export function EdcLargeThumb({ size = 48 }: { size?: number }) {
+  return (
+    <svg width={size} height={size} viewBox="0 0 48 48" aria-hidden="true">
+      <path d="M16 2h16v5H16z" fill="#fff" stroke="#8db4ff" strokeWidth="1.2" />
+      <rect x="10" y="5" width="28" height="41" rx="5" fill="#0b2253" />
+      <rect x="13" y="9" width="22" height="30" rx="2.5" fill="#e9f1ff" />
+      <rect x="13" y="9" width="22" height="6" rx="2.5" fill="#0069fc" />
+      <Pattern x={17} y={18} size={14} color="#0b2253" />
+      <rect x="20" y="41.5" width="8" height="2" rx="1" fill="#8db4ff" />
+    </svg>
+  );
+}
+
+export function ProductThumb({ code, size = 48 }: { code: string; size?: number }) {
+  if (code === 'A620') return <EdcSmallThumb size={size} />;
+  if (code === 'A920PRO') return <EdcLargeThumb size={size} />;
+  if (code === 'AKRILIK') return <AcrylicThumb size={size} />;
+  return <StickerThumb size={size} />;
+}
+
+/** Top banner for "Beli EDC": two terminals on a blue counter. */
+export function EdcHero() {
+  return (
+    <svg viewBox="0 0 360 170" width="100%" style={{ display: 'block' }} role="img" aria-label="Mesin EDC">
+      <defs>
+        <linearGradient id="edc-bg" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stopColor="#0a2a6e" /><stop offset="1" stopColor="#0069fc" /></linearGradient>
+      </defs>
+      <rect width="360" height="170" fill="url(#edc-bg)" />
+      <circle cx="310" cy="20" r="70" fill="#fff" opacity=".07" />
+      <circle cx="30" cy="170" r="70" fill="#fff" opacity=".06" />
+      <rect y="140" width="360" height="30" fill="#061a45" opacity=".45" />
+      <g transform="translate(100 14) rotate(-6)">
+        <path d="M30 0h40v12H30z" fill="#fff" />
+        <rect y="8" width="100" height="132" rx="14" fill="#0b2253" stroke="#3a8bff" strokeWidth="2" />
+        <rect x="9" y="20" width="82" height="96" rx="7" fill="#e9f1ff" />
+        <rect x="9" y="20" width="82" height="18" rx="7" fill="#0069fc" />
+        <rect x="9" y="31" width="82" height="7" fill="#0069fc" />
+        <text x="50" y="33" textAnchor="middle" fontSize="10" fontWeight="800" fill="#fff" fontFamily="inherit">Rp150.000</text>
+        <Pattern x={27} y={48} size={46} />
+        <rect x="38" y="124" width="24" height="5" rx="2.5" fill="#3a8bff" />
+      </g>
+      <g transform="translate(222 46) rotate(7)">
+        <rect width="60" height="104" rx="10" fill="#0b2253" stroke="#3a8bff" strokeWidth="2" />
+        <rect x="7" y="9" width="46" height="34" rx="4" fill="#cfe0ff" />
+        <Pattern x={17} y={12} size={26} color="#0069fc" />
+        <g fill="#8db4ff">
+          {[0, 1, 2, 3].flatMap((r) => [0, 1, 2].map((c) => <rect key={`${r}${c}`} x={9 + c * 15} y={50 + r * 12} width="12" height="8" rx="2" />))}
+        </g>
+      </g>
+      <g fill="#fff">
+        <path d="M58 46l3 8 8 3-8 3-3 8-3-8-8-3 8-3z" opacity=".9" />
+        <path d="M322 116l2 5 5 2-5 2-2 5-2-5-5-2 5-2z" opacity=".7" />
+      </g>
+    </svg>
+  );
+}

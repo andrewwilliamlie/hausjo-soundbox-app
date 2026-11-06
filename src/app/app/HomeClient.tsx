@@ -57,7 +57,7 @@ export default function HomeClient({ app, isNew, outletCount }: { app: AppView; 
     { icon: 'speaker', label: 'Soundbox', action: () => { setSbWay(active && app.product === 'SOUNDBOX' ? 'arrived' : 'buy'); setSheet('sb'); } },
     { icon: 'store', label: 'Toko saya', href: '/app/toko' },
     { icon: 'printer', label: 'Pesan stiker', href: '/app/stiker' },
-    { icon: 'edc', label: 'Beli EDC', href: 'https://hausjo.id/produk', external: true },
+    { icon: 'edc', label: 'Beli EDC', href: '/app/edc' },
     { icon: 'gift', label: 'Referral', action: soon, soon: true },
     { icon: 'sort', label: 'Laporan', action: soon, soon: true },
     { icon: 'help', label: 'Bantuan', href: waLink(`Halo AIPOS, saya butuh bantuan. Tiket ${app.ticket}.`), external: true },

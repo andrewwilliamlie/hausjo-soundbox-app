@@ -6,7 +6,7 @@ import { z } from 'zod';
 import { audit, requireAdmin } from '@/lib/auth';
 import { db } from '@/lib/db';
 import { mails, sendMail } from '@/lib/mail';
-import { STATUS_LABEL, type StickerStatus } from '@/lib/sticker';
+import { asKind, statusLabel, type StickerStatus } from '@/lib/sticker';
 
 const input = z.object({
   id: z.string().min(1),
@@ -37,10 +37,10 @@ export async function updateStickerOrder(form: FormData) {
       history: history as unknown as Prisma.InputJsonValue
     }
   });
-  await audit(admin.id, 'STICKER_' + d.status, o.applicationId, `${o.number}${changed ? '' : ' (detail)'}`);
+  await audit(admin.id, `${asKind(o.kind)}_ORDER_${d.status}`, o.applicationId, `${o.number}${changed ? '' : ' (detail)'}`);
   if (changed) {
     const extra = d.status === 'SHIPPED' && d.trackingNo ? `Kurir: ${d.courier || '-'}\nNomor resi: ${d.trackingNo}` : '';
-    const m = mails.stickerStatus(o.number, STATUS_LABEL[d.status as StickerStatus], extra);
+    const m = mails.stickerStatus(o.number, statusLabel(d.status as StickerStatus, asKind(o.kind)), extra, asKind(o.kind));
     void sendMail(o.user.email, m.subject, m.text);
   }
   revalidatePath('/admin/stiker');

@@ -4,19 +4,35 @@ import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { useState, useTransition } from 'react';
 import Icon from '@/components/Icon';
-import { AcrylicThumb, StickerHero, StickerThumb } from '@/components/StickerArt';
-import { ADDRESS_LABELS, PACKAGES, SHIPPING_FEE, TIME_SLOTS, priceOrder, rp } from '@/lib/sticker';
+import { EdcHero, ProductThumb, StickerHero } from '@/components/StickerArt';
+import { ADDRESS_LABELS, KIND_PATH, SHIPPING_FEE, TIME_SLOTS, feeText, packagesOf, priceOrder, rp, type Kind } from '@/lib/sticker';
 import RegionPicker from '../../daftar/langkah/RegionPicker';
 import { Sheet } from '../Sheets';
 import { placeOrder, saveAddress, type AddressInput, type SavedAddress } from './actions';
 
 type Step = 'paket' | 'alamat' | 'form' | 'konfirmasi';
-const TITLE: Record<Step, string> = { paket: 'Pesan stiker QRIS', alamat: 'Alamat pengiriman', form: 'Isi alamat pengiriman', konfirmasi: 'Konfirmasi pesanan' };
+const TITLE: Record<Step, string> = { paket: '', alamat: 'Alamat pengiriman', form: 'Isi alamat pengiriman', konfirmasi: 'Konfirmasi pesanan' };
+const TEXT: Record<Kind, { title: string; pick: string; unit: string; note: string; what: string; after: string }> = {
+  STIKER: {
+    title: 'Pesan stiker QRIS', pick: 'Pilih paket yang diinginkan', unit: 'paket',
+    note: 'Stiker dicetak dengan QRIS toko ini. Untuk toko lain, ganti toko dulu di menu Toko saya.',
+    what: 'Stiker QRIS cetak dengan nama toko dan NMID Anda, siap ditempel di kasir. Paket Akrilik sudah termasuk stand akrilik untuk meja kasir.',
+    after: 'Stiker dicetak setelah pembayaran diterima, lalu dikirim dalam 2–5 hari kerja.'
+  },
+  EDC: {
+    title: 'Beli EDC', pick: 'Pilih mesin EDC', unit: 'unit',
+    note: 'EDC disiapkan untuk toko ini. Untuk toko lain, ganti toko dulu di menu Toko saya.',
+    what: 'PAX A620 untuk pembayaran QRIS dinamis: nominal muncul langsung di layar, pembeli tinggal scan. PAX A920 Pro menerima kartu debit, kartu kredit dan QRIS. CS AIPOS memandu aktivasi setelah mesin sampai.',
+    after: 'EDC disiapkan setelah pembayaran diterima, lalu dikirim ke alamat Anda.'
+  }
+};
 
 const oneLine = (a: AddressInput) => [a.address, a.kelurahan, a.kecamatan, a.city, a.province, a.postalCode].filter(Boolean).join(', ');
 const strike = { textDecoration: 'line-through', color: 'var(--muted)', fontSize: 12.5 } as const;
 
-export default function OrderWizard({ store, saved, blank }: { store: { name: string; area: string }; saved: SavedAddress[]; blank: AddressInput }) {
+export default function OrderWizard({ kind, store, saved, blank }: { kind: Kind; store: { name: string; area: string }; saved: SavedAddress[]; blank: AddressInput }) {
+  const T = TEXT[kind];
+  const packages = packagesOf(kind);
   const router = useRouter();
   const [step, setStep] = useState<Step>('paket');
   const [qty, setQty] = useState<Record<string, number>>({});
@@ -28,9 +44,9 @@ export default function OrderWizard({ store, saved, blank }: { store: { name: st
   const [error, setError] = useState('');
   const [pending, start] = useTransition();
 
-  const t = priceOrder(qty);
+  const t = priceOrder(qty, kind);
   const addr = list.find((a) => a.id === addrId);
-  const set = (code: string, n: number) => setQty((q) => ({ ...q, [code]: Math.max(0, Math.min(PACKAGES.find((p) => p.code === code)!.max, n)) }));
+  const set = (code: string, n: number) => setQty((q) => ({ ...q, [code]: Math.max(0, Math.min(packages.find((p) => p.code === code)!.max, n)) }));
   const go = (s: Step) => { setError(''); setStep(s); window.scrollTo({ top: 0 }); };
   const back = () => go(step === 'konfirmasi' ? 'alamat' : step === 'form' && list.length ? 'alamat' : 'paket');
   const openForm = (a?: SavedAddress) => { setForm(a ? { ...a } : { ...blank, label: list.some((x) => x.label === 'Toko') ? 'Rumah' : blank.label }); go('form'); };
@@ -52,9 +68,9 @@ export default function OrderWizard({ store, saved, blank }: { store: { name: st
   function submit() {
     setError('');
     start(async () => {
-      const r = await placeOrder({ qty, addressId: addrId, timeSlot: slot || undefined });
+      const r = await placeOrder({ kind, qty, addressId: addrId, timeSlot: slot || undefined });
       if (!r.ok) return setError(r.error);
-      router.push(`/app/stiker/${r.data}?baru=1`);
+      router.push(`${KIND_PATH[kind]}/${r.data}?baru=1`);
     });
   }
 
@@ -70,10 +86,10 @@ export default function OrderWizard({ store, saved, blank }: { store: { name: st
       <div className="page-top">
         <div className="page-top-row">
           {step === 'paket'
-            ? <Link href="/app/stiker" aria-label="Kembali" className="back"><Icon name="arrowLeft" size={22} /></Link>
+            ? <Link href={KIND_PATH[kind]} aria-label="Kembali" className="back"><Icon name="arrowLeft" size={22} /></Link>
             : <button type="button" onClick={back} aria-label="Kembali" className="back" style={{ background: 'none', border: 0, cursor: 'pointer' }}><Icon name="arrowLeft" size={22} /></button>}
           <span style={{ display: 'flex', flexDirection: 'column', minWidth: 0 }}>
-            <h1>{TITLE[step]}</h1>
+            <h1>{TITLE[step] || T.title}</h1>
             <span style={{ fontSize: 12.5, color: '#dbe8ff' }}>Untuk {store.name}</span>
           </span>
         </div>
@@ -83,23 +99,23 @@ export default function OrderWizard({ store, saved, blank }: { store: { name: st
       <main className="app-sheet inner">
         {step === 'paket' && (
           <div className="screen-in" style={{ display: 'flex', flexDirection: 'column', gap: 14 }}>
-            <div style={{ borderRadius: 16, overflow: 'hidden' }}><StickerHero /></div>
+            <div style={{ borderRadius: 16, overflow: 'hidden' }}>{kind === 'EDC' ? <EdcHero /> : <StickerHero />}</div>
             <section className="card" style={{ gap: 14 }}>
-              <strong style={{ fontSize: 16 }}>Pilih paket yang diinginkan</strong>
+              <strong style={{ fontSize: 16 }}>{T.pick}</strong>
               <p className="note" style={{ margin: 0, fontSize: 13, background: 'var(--warn-soft)', border: '1px solid #f7c98b', borderRadius: 12, padding: '10px 12px' }}>
-                Paket berlaku untuk satu toko: <b>{store.name}</b>. Stiker dicetak dengan QRIS toko ini. Untuk toko lain, ganti toko dulu di menu Toko saya.
+                Pesanan ini untuk satu toko: <b>{store.name}</b>. {T.note}
               </p>
-              {PACKAGES.map((p) => {
+              {packages.map((p) => {
                 const n = qty[p.code] ?? 0;
                 return (
                   <div key={p.code} style={{ display: 'flex', gap: 12, alignItems: 'center' }}>
                     <span style={{ width: 56, height: 56, borderRadius: 12, background: 'var(--tile)', display: 'inline-flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
-                      {p.code === 'STIKER' ? <StickerThumb /> : <AcrylicThumb />}
+                      <ProductThumb code={p.code} />
                     </span>
                     <span style={{ flex: 1, minWidth: 0, display: 'flex', flexDirection: 'column', gap: 2 }}>
                       <strong style={{ fontSize: 15 }}>{p.name}</strong>
                       <span style={{ fontSize: 13 }}>{p.desc}</span>
-                      <span style={{ display: 'flex', gap: 6, alignItems: 'baseline' }}><span style={strike}>{rp(p.normalPrice)}</span><strong style={{ fontSize: 14 }}>{rp(p.price)}</strong></span>
+                      <span style={{ display: 'flex', gap: 6, alignItems: 'baseline' }}>{p.normalPrice > p.price && <span style={strike}>{rp(p.normalPrice)}</span>}<strong style={{ fontSize: 14 }}>{rp(p.price)}</strong></span>
                     </span>
                     {n === 0
                       ? <button type="button" className="btn btn-ghost" style={{ minHeight: 40, padding: '0 18px', borderRadius: 999 }} onClick={() => set(p.code, 1)} aria-label={`Tambah ${p.name}`}>Tambah</button>
@@ -114,7 +130,7 @@ export default function OrderWizard({ store, saved, blank }: { store: { name: st
             </section>
             <section className="card" style={{ gap: 8 }}>
               <strong style={{ fontSize: 14 }}>Yang Anda terima</strong>
-              <span className="hint">Stiker QRIS cetak dengan nama toko dan NMID Anda, siap ditempel di kasir. Paket Akrilik sudah termasuk stand akrilik untuk meja kasir. Ongkos kirim {rp(SHIPPING_FEE)} per pesanan.</span>
+              <span className="hint">{T.what} Ongkos kirim: {feeText(SHIPPING_FEE[kind])}{SHIPPING_FEE[kind] ? ' per pesanan' : ''}.</span>
             </section>
           </div>
         )}
@@ -186,13 +202,13 @@ export default function OrderWizard({ store, saved, blank }: { store: { name: st
         {step === 'konfirmasi' && addr && (
           <div className="screen-in" style={{ display: 'flex', flexDirection: 'column', gap: 14 }}>
             <p className="note" style={{ margin: 0, fontSize: 13, display: 'flex', gap: 8, background: 'var(--blue-soft)', borderRadius: 12, padding: '10px 12px' }}>
-              <Icon name="truck" size={18} color="var(--blue)" />Stiker dicetak setelah pembayaran diterima, lalu dikirim dalam 2–5 hari kerja.
+              <Icon name="truck" size={18} color="var(--blue)" />{T.after}
             </p>
             <section className="card" style={{ gap: 4 }}>
               <strong style={{ fontSize: 15, marginBottom: 6 }}>Detail pesanan</strong>
               {t.items.map((i) => (
                 <div key={i.code} style={{ display: 'flex', gap: 12, alignItems: 'center', padding: '6px 0' }}>
-                  {i.code === 'STIKER' ? <StickerThumb size={40} /> : <AcrylicThumb size={40} />}
+                  <ProductThumb code={i.code} size={40} />
                   <span style={{ flex: 1, display: 'flex', flexDirection: 'column', fontSize: 13 }}><strong style={{ fontSize: 14 }}>{i.name}</strong><span className="hint">{i.qty} × {rp(i.price)}</span></span>
                   <strong style={{ fontSize: 14 }}>{rp(i.price * i.qty)}</strong>
                 </div>
@@ -213,8 +229,8 @@ export default function OrderWizard({ store, saved, blank }: { store: { name: st
             </section>
             <section className="card" style={{ gap: 0 }}>
               <strong style={{ fontSize: 15, marginBottom: 6 }}>Ringkasan belanja</strong>
-              <div className="sum-row"><span>Pesanan</span><span><span style={strike}>{rp(t.normalTotal)}</span> {rp(t.subtotal)}</span></div>
-              <div className="sum-row"><span>Biaya pengiriman</span><span>{rp(t.shippingFee)}</span></div>
+              <div className="sum-row"><span>Pesanan</span><span>{t.normalTotal > t.subtotal && <span style={strike}>{rp(t.normalTotal)}</span>} {rp(t.subtotal)}</span></div>
+              <div className="sum-row"><span>Biaya pengiriman</span><span>{feeText(t.shippingFee)}</span></div>
               <div className="sum-row total"><span>Total pembayaran</span><span>{rp(t.total)}</span></div>
               {t.savings > 0 && <div className="sum-row" style={{ background: 'var(--ok-soft)', color: 'var(--ok)', fontWeight: 700, borderRadius: 10, padding: '10px 12px', marginTop: 10 }}><span>Penghematan</span><span>{rp(t.savings)}</span></div>}
             </section>
@@ -226,7 +242,7 @@ export default function OrderWizard({ store, saved, blank }: { store: { name: st
         <div className="bottom-bar">
           {step !== 'form' && t.items.length > 0 && (
             <span style={{ flex: 1, display: 'flex', flexDirection: 'column' }}>
-              <span className="hint">{step === 'konfirmasi' ? 'Total' : `${t.items.reduce((s, i) => s + i.qty, 0)} paket`}</span>
+              <span className="hint">{step === 'konfirmasi' ? 'Total' : `${t.items.reduce((s, i) => s + i.qty, 0)} ${T.unit}`}</span>
               <strong style={{ fontSize: 17 }}>{rp(step === 'konfirmasi' ? t.total : t.subtotal)}</strong>
             </span>
           )}

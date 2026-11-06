@@ -5,7 +5,7 @@ import { adminLogout } from './actions';
 
 const TABS: Array<[string, string, string, boolean]> = [
   ['antrean', 'Antrean', '/admin', false],
-  ['stiker', 'Pesanan stiker', '/admin/stiker', false],
+  ['stiker', 'Pesanan', '/admin/stiker', false],
   ['tim', 'Tim', '/admin/tim', true],
   ['cadangan', 'Cadangan', '/admin/cadangan', true],
   ['akun', 'Akun saya', '/admin/akun', false]

@@ -44,13 +44,13 @@ export const mails = {
     subject: `Perlu perbaikan foto · ${ticket}`,
     text: `Ada foto yang perlu diganti:\n${items.map((i) => '- ' + i).join('\n')}\n\nFoto lain sudah disetujui. Unggah ulang di:\n${APP()}/app\n\nAIPOS`
   }),
-  stickerOrdered: (no: string, store: string, items: string, total: string) => ({
-    subject: `Pesanan stiker diterima · ${no}`,
-    text: `Pesanan stiker QRIS untuk ${store} sudah kami terima.\n\n${items}\nTotal: ${total}\n\nTim AIPOS akan mengirim link pembayaran ke WhatsApp Anda di jam kerja. Stiker dicetak setelah pembayaran diterima. Lihat status pesanan:\n${APP()}/app/stiker\n\nAIPOS`
+  stickerOrdered: (no: string, store: string, items: string, total: string, kind: 'STIKER' | 'EDC' = 'STIKER') => ({
+    subject: `Pesanan ${kind === 'EDC' ? 'EDC' : 'stiker'} diterima · ${no}`,
+    text: `Pesanan ${kind === 'EDC' ? 'EDC' : 'stiker QRIS'} untuk ${store} sudah kami terima.\n\n${items}\nTotal: ${total}\n\nTim AIPOS akan mengirim link pembayaran ke WhatsApp Anda di jam kerja. ${kind === 'EDC' ? 'EDC disiapkan' : 'Stiker dicetak'} setelah pembayaran diterima. Lihat status pesanan:\n${APP()}/app/${kind === 'EDC' ? 'edc' : 'stiker'}\n\nAIPOS`
   }),
-  stickerStatus: (no: string, status: string, extra = '') => ({
+  stickerStatus: (no: string, status: string, extra = '', kind: 'STIKER' | 'EDC' = 'STIKER') => ({
     subject: `${status} · ${no}`,
-    text: `Status pesanan stiker ${no}: ${status}.${extra ? '\n\n' + extra : ''}\n\nLihat detailnya:\n${APP()}/app/stiker\n\nAIPOS`
+    text: `Status pesanan ${kind === 'EDC' ? 'EDC' : 'stiker'} ${no}: ${status}.${extra ? '\n\n' + extra : ''}\n\nLihat detailnya:\n${APP()}/app/${kind === 'EDC' ? 'edc' : 'stiker'}\n\nAIPOS`
   }),
   active: (ticket: string, name: string) => ({
     subject: `QRIS Anda sudah aktif · ${name}`,

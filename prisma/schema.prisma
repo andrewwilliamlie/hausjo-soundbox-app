@@ -283,10 +283,12 @@ enum StickerStatus {
   CANCELLED
 }
 
-// Printed QRIS sticker / acrylic stand orders ("Pesan stiker"). One order is for one store's QRIS.
+// Shop orders from the app: printed QRIS stickers / acrylic stands ("Pesan stiker") and EDC terminals ("Beli EDC").
+// One order is for one store.
 model StickerOrder {
   id            String        @id @default(cuid())
-  number        String        @unique // STK-YYMMDD-XXXX
+  kind          String        @default("STIKER") // STIKER | EDC
+  number        String        @unique // STK-YYMMDD-XXXX or EDC-YYMMDD-XXXX
   userId        String
   user          User          @relation(fields: [userId], references: [id], onDelete: Cascade)
   applicationId String        // the store whose QRIS is printed
