@@ -42,15 +42,21 @@ const TEXT: Record<Kind, { title: string; pick: string; unit: string; note: stri
 const oneLine = (a: AddressInput) => [a.address, a.kelurahan, a.kecamatan, a.city, a.province, a.postalCode].filter(Boolean).join(', ');
 const strike = { textDecoration: 'line-through', color: 'var(--muted)', fontSize: 12.5 } as const;
 
-export default function OrderWizard({ kind, store, saved, blank }: { kind: Kind; store: { name: string; area: string }; saved: SavedAddress[]; blank: AddressInput }) {
+export type StoreOpt = { id: string; name: string; area: string; ok: boolean; why: string; blank: AddressInput };
+
+export default function OrderWizard({ kind, stores, initialStore, saved }: { kind: Kind; stores: StoreOpt[]; initialStore: string; saved: SavedAddress[] }) {
   const T = TEXT[kind];
+  const [storeId, setStoreId] = useState(initialStore);
+  const store = stores.find((s) => s.id === storeId) ?? stores[0];
+  const blank = store.blank;
+  const [pickStore, setPickStore] = useState(false);
   const packages = packagesOf(kind);
   const router = useRouter();
   const [step, setStep] = useState<Step>('paket');
   const [qty, setQty] = useState<Record<string, number>>({});
   const [list, setList] = useState(saved);
   const [addrId, setAddrId] = useState(saved[0]?.id ?? '');
-  const [form, setForm] = useState<AddressInput & { id?: string }>(blank);
+  const [form, setForm] = useState<AddressInput & { id?: string }>(store.blank);
   const [slot, setSlot] = useState('');
   const [check, setCheck] = useState(false);
   const [error, setError] = useState('');
@@ -80,7 +86,7 @@ export default function OrderWizard({ kind, store, saved, blank }: { kind: Kind;
   function submit() {
     setError('');
     start(async () => {
-      const r = await placeOrder({ kind, qty, addressId: addrId, timeSlot: slot || undefined });
+      const r = await placeOrder({ kind, storeId, qty, addressId: addrId, timeSlot: slot || undefined });
       if (!r.ok) return setError(r.error);
       router.push(`${KIND_PATH[kind]}/${r.data}?baru=1`);
     });
@@ -114,9 +120,21 @@ export default function OrderWizard({ kind, store, saved, blank }: { kind: Kind;
             <div style={{ borderRadius: 16, overflow: 'hidden' }}><ShopHero kind={kind} /></div>
             <section className="card" style={{ gap: 14 }}>
               <strong style={{ fontSize: 16 }}>{T.pick}</strong>
-              <p className="note" style={{ margin: 0, fontSize: 13, background: 'var(--warn-soft)', border: '1px solid #f7c98b', borderRadius: 12, padding: '10px 12px' }}>
-                Pesanan ini untuk satu toko: <b>{store.name}</b>. {T.note}
-              </p>
+              {stores.length > 1 ? (
+                <button type="button" className="cat-field" onClick={() => setPickStore(true)} aria-label={`Untuk toko ${store.name}. Ganti toko`}>
+                  <Icon name="store" size={22} color="var(--blue)" />
+                  <span style={{ flex: 1, textAlign: 'left', display: 'flex', flexDirection: 'column', minWidth: 0 }}>
+                    <span className="hint" style={{ fontSize: 12 }}>Untuk toko</span>
+                    <strong style={{ fontSize: 15 }}>{store.name}</strong>
+                  </span>
+                  <span style={{ color: 'var(--blue)', fontWeight: 700, fontSize: 13 }}>Ganti</span>
+                </button>
+              ) : (
+                <p className="note" style={{ margin: 0, fontSize: 13, background: 'var(--warn-soft)', border: '1px solid #f7c98b', borderRadius: 12, padding: '10px 12px' }}>
+                  Pesanan ini untuk toko <b>{store.name}</b>.
+                </p>
+              )}
+              {stores.length > 1 && <span className="hint" style={{ marginTop: -6 }}>Satu pesanan untuk satu toko{kind === 'STIKER' ? '; stiker dicetak dengan QRIS toko ini' : ''}. Untuk toko lain, buat pesanan lagi.</span>}
               {packages.map((p) => {
                 const n = qty[p.code] ?? 0;
                 return (
@@ -263,6 +281,27 @@ export default function OrderWizard({ kind, store, saved, blank }: { kind: Kind;
           </button>
         </div>
       </main>
+
+      {pickStore && (
+        <Sheet label="Pilih toko" onClose={() => setPickStore(false)}>
+          <h2 className="h2" style={{ fontSize: 19 }}>Pesan untuk toko mana?</h2>
+          <div role="radiogroup" aria-label="Toko" style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
+            {stores.map((s) => (
+              <button key={s.id} type="button" role="radio" aria-checked={s.id === storeId} className="choice" disabled={!s.ok}
+                onClick={() => { setStoreId(s.id); setPickStore(false); }}
+                style={{ flexDirection: 'row', alignItems: 'center', gap: 10, opacity: s.ok ? 1 : 0.55, cursor: s.ok ? 'pointer' : 'not-allowed' }}>
+                <Icon name="store" size={20} color={s.ok ? 'var(--blue)' : 'var(--muted)'} />
+                <span style={{ flex: 1, display: 'flex', flexDirection: 'column', gap: 2, textAlign: 'left' }}>
+                  <strong style={{ fontSize: 14 }}>{s.name}</strong>
+                  <span className="hint" style={{ fontSize: 12 }}>{s.ok ? s.area : s.why}</span>
+                </span>
+                <span className={`radio-dot${s.id === storeId ? ' on' : ''}`} aria-hidden="true" />
+              </button>
+            ))}
+          </div>
+          {kind === 'STIKER' && stores.some((s) => !s.ok) && <span className="hint">Stiker berisi QRIS toko, jadi toko yang QRIS-nya belum aktif belum bisa dipilih.</span>}
+        </Sheet>
+      )}
 
       {check && addr && (
         <Sheet label="Cek alamat" onClose={() => setCheck(false)}>

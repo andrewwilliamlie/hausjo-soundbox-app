@@ -55,6 +55,7 @@ export async function deleteAddress(id: string): Promise<Res> {
 }
 
 const order = z.object({
+  storeId: z.string().max(40).optional(),
   kind: z.enum(['STIKER', 'EDC', 'SOUNDBOX', 'KERTAS']).default('STIKER'),
   qty: z.record(z.string(), z.number().int().min(0).max(100)),
   addressId: z.string().min(1, 'Pilih alamat pengiriman'),
@@ -71,8 +72,9 @@ export async function placeOrder(raw: unknown): Promise<Res<string>> {
   if (!uid) return { ok: false, error: 'Silakan masuk lagi' };
   const p = order.safeParse(raw);
   if (!p.success) return { ok: false, error: p.error.issues[0]?.message ?? 'Pesanan belum lengkap' };
-  const outletId = await currentOutletId(uid);
-  const store = outletId ? await db.application.findUnique({ where: { id: outletId }, include: { user: true } }) : null;
+  // The store chosen in the order (must be the merchant's own); else the one being viewed.
+  const outletId = p.data.storeId || (await currentOutletId(uid));
+  const store = outletId ? await db.application.findFirst({ where: { id: outletId, userId: uid }, include: { user: true } }) : null;
   const kind = p.data.kind;
   if (!store || store.status === 'DRAFT') return { ok: false, error: 'Selesaikan pendaftaran toko dulu' };
   // A sticker carries the store's QRIS, so it needs an active QRIS; an EDC can be bought any time after signup.

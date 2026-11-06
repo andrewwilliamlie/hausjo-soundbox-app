@@ -35,7 +35,9 @@ const canOrder = (kind: Kind, status: string) => (kind === 'STIKER' ? status ===
 export async function OrdersList({ kind }: { kind: Kind }) {
   const { user, app, outletCount } = await stickerContext();
   const C = COPY[kind];
-  const ok = canOrder(kind, app.status);
+  const all = await db.application.findMany({ where: { userId: user.id, status: { not: 'DRAFT' } }, select: { id: true, businessName: true, status: true } });
+  const okStores = all.filter((a) => canOrder(kind, a.status));
+  const ok = okStores.length > 0;
   const orders = await db.stickerOrder.findMany({ where: { userId: user.id, kind }, orderBy: { createdAt: 'desc' }, take: 50 });
   const names = new Map((await db.application.findMany({ where: { userId: user.id }, select: { id: true, businessName: true } })).map((a) => [a.id, a.businessName ?? 'Toko']));
 
@@ -46,7 +48,7 @@ export async function OrdersList({ kind }: { kind: Kind }) {
         <section className="card" style={{ padding: 0, overflow: 'hidden', gap: 0 }}>
           <ShopHero kind={kind} />
           <div style={{ padding: 16, display: 'flex', flexDirection: 'column', gap: 10 }}>
-            <strong style={{ fontSize: 16 }}>{C.intro(app.businessName ?? 'toko Anda')}</strong>
+            <strong style={{ fontSize: 16 }}>{all.length > 1 ? C.intro('toko Anda') : C.intro(app.businessName ?? 'toko Anda')}</strong>
             {kind === 'EDC' && (
               <span style={{ display: 'flex', flexDirection: 'column', gap: 8, fontSize: 13.5 }}>
                 <span style={{ display: 'flex', gap: 10, alignItems: 'center' }}><ProductThumb code="A620" size={36} /><span><b>PAX A620</b> · QRIS dinamis · {rp(699000)}</span></span>
@@ -56,6 +58,7 @@ export async function OrdersList({ kind }: { kind: Kind }) {
             {ok ? (
               <>
                 {kind === 'STIKER' && <span className="hint">Pilih stiker saja atau stiker dengan stand akrilik. Dikirim ke alamat Anda.</span>}
+                {all.length > 1 && <span className="hint">Bisa dipesan untuk: <b>{okStores.map((a) => a.businessName ?? 'Toko').join(', ')}</b>.{kind === 'STIKER' && okStores.length < all.length ? ' Toko lain bisa memesan setelah QRIS-nya aktif.' : ''} Pilih tokonya di langkah berikutnya.</span>}
                 {kind === 'SOUNDBOX' && <span className="hint">Menyebut nominal setiap pembayaran QRIS. {rp(349000)} sekali bayar, tanpa sewa.</span>}
                 {kind === 'KERTAS' && <span className="hint">{rp(20000)} per pak isi 10 gulung kertas thermal 58 mm.</span>}
                 <Link href={`${KIND_PATH[kind]}/pesan`} className="btn btn-primary btn-block" style={{ gap: 8 }}><Icon name={kind === 'EDC' ? 'edc' : kind === 'SOUNDBOX' ? 'speaker' : kind === 'KERTAS' ? 'file' : 'printer'} size={18} />{C.cta}</Link>
@@ -63,9 +66,8 @@ export async function OrdersList({ kind }: { kind: Kind }) {
             ) : (
               <>
                 <span className="hint">{kind === 'STIKER'
-                  ? 'Stiker berisi QRIS toko ini, jadi baru bisa dipesan setelah QRIS aktif. Kami kabari lewat email saat QRIS terbit.'
+                  ? `Stiker berisi QRIS toko, jadi baru bisa dipesan setelah QRIS aktif.${all.length > 1 ? ' Belum ada toko Anda yang QRIS-nya aktif.' : ''} Kami kabari lewat email saat QRIS terbit.`
                   : `Pendaftaran toko ini ditolak, jadi ${KIND_NAME[kind]} belum bisa dipesan. Hubungi CS AIPOS.`}</span>
-                {outletCount > 1 && <Link href="/app/toko" className="btn btn-ghost btn-block">Pilih toko lain</Link>}
               </>
             )}
           </div>
@@ -103,21 +105,28 @@ export async function OrdersList({ kind }: { kind: Kind }) {
 
 export async function NewOrder({ kind }: { kind: Kind }) {
   const { user, app } = await stickerContext();
-  if (!canOrder(kind, app.status)) redirect(KIND_PATH[kind]);
+  const apps = await db.application.findMany({ where: { userId: user.id, status: { not: 'DRAFT' } }, orderBy: { createdAt: 'asc' } });
+  const stores = apps.map((a) => {
+    // A new address starts from that store's own address.
+    const street = [a.street, a.number, a.rt || a.rw ? `RT ${a.rt ?? '-'}/RW ${a.rw ?? '-'}` : ''].filter(Boolean).join(' ');
+    return {
+      id: a.id, name: a.businessName ?? 'Toko', area: [a.kelurahan, a.kecamatan].filter(Boolean).join(', '),
+      ok: canOrder(kind, a.status), why: kind === 'STIKER' ? 'QRIS belum aktif' : 'Pendaftaran ditolak',
+      blank: {
+        label: 'Toko', recipient: a.ktpName ?? '', phone: user.phone, address: [a.businessName, street].filter(Boolean).join(', '),
+        province: a.province ?? '', city: a.city ?? '', kecamatan: a.kecamatan ?? '', kelurahan: a.kelurahan ?? '',
+        postalCode: a.postalCode ?? '', villageCode: a.villageCode ?? '', courierNote: ''
+      }
+    };
+  });
+  if (!stores.some((x) => x.ok)) redirect(KIND_PATH[kind]);
   const rows = await db.shipAddress.findMany({ where: { userId: user.id }, orderBy: { updatedAt: 'desc' } });
   const saved = rows.map((a) => ({
     id: a.id, label: a.label, recipient: a.recipient, phone: a.phone, address: a.address, province: a.province, city: a.city,
     kecamatan: a.kecamatan, kelurahan: a.kelurahan, postalCode: a.postalCode, villageCode: a.villageCode ?? '', courierNote: a.courierNote ?? ''
   }));
-  // A new address starts from the store's own address.
-  const street = [app.street, app.number, app.rt || app.rw ? `RT ${app.rt ?? '-'}/RW ${app.rw ?? '-'}` : ''].filter(Boolean).join(' ');
-  const blank = {
-    label: 'Toko', recipient: app.ktpName ?? '', phone: user.phone, address: [app.businessName, street].filter(Boolean).join(', '),
-    province: app.province ?? '', city: app.city ?? '', kecamatan: app.kecamatan ?? '', kelurahan: app.kelurahan ?? '',
-    postalCode: app.postalCode ?? '', villageCode: app.villageCode ?? '', courierNote: ''
-  };
-  const area = [app.kelurahan, app.kecamatan].filter(Boolean).join(', ');
-  return <OrderWizard kind={kind} store={{ name: app.businessName ?? 'Toko', area }} saved={saved} blank={blank} />;
+  const first = stores.find((x) => x.id === app.id && x.ok) ?? stores.find((x) => x.ok)!;
+  return <OrderWizard kind={kind} stores={stores} initialStore={first.id} saved={saved} />;
 }
 
 const when = (iso?: string) => (iso ? new Date(iso).toLocaleString('id-ID', { timeZone: 'Asia/Jakarta', dateStyle: 'medium', timeStyle: 'short' }) + ' WIB' : '');
